@@ -11,7 +11,7 @@
       }
     },
     created () {
-      getRecommend.then((res) => {
+      getRecommend().then((res) => {
         if (res.code === 0) {
           this.recommends = res.data.slider
           console.log(this.recommends)
