@@ -1,4 +1,4 @@
-# vue-music
+# kaka-music
 
 > a vue.js game
 
