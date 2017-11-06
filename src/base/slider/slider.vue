@@ -11,6 +11,8 @@
 </template>
 <script>
 	import BScroll from 'better-scroll'
+	import {addClass} from	'common/js/dom.js'
+
 	export default {
 	  data () {
 	    return {
@@ -29,7 +31,7 @@
 	  	},
 	  	interval: {
 	  		type: Number,
-	  		default: 4000
+	  		default: 1000
 	  	}
 	  },
 	  mounted () {
@@ -37,11 +39,26 @@
 	  		this._setSliderWidth()
 	  		this._initDots()
 	  		this._initSlider()
+	  		if (this.autoPlay) {
+	  			this._play()
+	  		}
 	  	}, 20)
+	  	// 视口大小改变时重新设置宽度并计算宽度
+	  	window.addEventListener('resize', () => {
+	  		if (!this.slider) {
+	  			return
+	  		}
+	  		this._setSliderWidth(true)
+	  		this.slider.refresh()
+	  	})
 	  },
 	  methods: {
-	  	// 计算并设置容器宽度
-	    _setSliderWidth () {
+	  	/*
+			 * 设置并计算容器宽度
+			 * isRsize: {type: Boolean}
+			 * desc：视口大小改变时重新计算宽度不需要前后各添加一个元素
+	  	*/
+	    _setSliderWidth (isRsize) {
 	      this.children = this.$refs.sliderGroup.children
 
 	      let width = 0  // 总宽度
@@ -51,11 +68,14 @@
 	        child.style.width = sliderWidth + 'px'
 	        // width = sliderWidth * this.children.length
 	        width += sliderWidth
+
+	        addClass(child, 'slider-item')
 	      }
-	      // 如果循环播放的话，两边会分别别添加一个元素
-	      if (this.loop) {
+	      // 如果循环播放的话，前后会分别别添加一个元素（视口改变时不需要）
+	      if (this.loop && !isRsize) {
 	      	width += 2 * sliderWidth
 	      }
+
 	      this.$refs.sliderGroup.style.width = width + 'px'
 	    },
 	    // 设置dots个数
@@ -74,7 +94,6 @@
             speed: 400
           }
 	    	})
-
 	    	// 监听BScroll滚动结束事件获取当前元素索引
 	    	this.slider.on('scrollEnd', () => {
 	    		let pageIndex = this.slider.getCurrentPage().pageX
@@ -82,8 +101,28 @@
 	    			pageIndex -= 1
 	    		}
 	    		this.currentIndex = pageIndex
+
+	    		if (this.autoPlay) {
+	    			this._play()
+	    		}
 	    	})
-	    }
+	    	// 监听滚动（手动）开始之前事件，如果是自动轮播就清除
+        this.slider.on('beforeScrollStart', () => {
+          if (this.autoPlay) {
+            clearTimeout(this.timer)
+          }
+        })
+	    },
+    	// 自动轮播
+    	_play () {
+    		let pageIndex = this.currentIndex + 1
+    		if (this.loop) {
+    			pageIndex += 1
+    		}
+    		this.timer = setTimeout(() => {
+    			this.slider.goToPage(pageIndex, 0, 400)
+    		}, this.interval)
+    	}
 		}
 	}
 </script>
@@ -123,6 +162,6 @@
 	 			background: $color-text-l
 	 			&.active
 	 				width: 20px
-	 				border-radius: 50%
+	 				border-radius: 5px
 	 				background: $color-text-ll
 </style>
