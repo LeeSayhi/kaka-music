@@ -32,6 +32,10 @@
 	  	interval: {
 	  		type: Number,
 	  		default: 1000
+	  	},
+	  	data: {
+	  		type: Array,
+	  		default: null
 	  	}
 	  },
 	  mounted () {
@@ -52,6 +56,17 @@
 	  		this.slider.refresh()
 	  	})
 	  },
+	  activated () {
+  		if (this.autoPlay) {
+  			this._play()
+  		}
+	  },
+	  deactivated () {
+	  	clearTimeout(this.timer)
+	  },
+    beforeDestroy () {
+      clearTimeout(this.timer)
+    },
 	  methods: {
 	  	/*
 			 * 设置并计算容器宽度

@@ -34,8 +34,15 @@
           return
         }
         this.scroll = new BScroll(this.$refs.wrapper, {
-          click: true
+          click: true,
+          probeType: 3
         })
+        this.scroll.on('scroll', (pos) => {
+          this.$emit('scrollY', pos.y)
+        })
+      },
+      refresh () {
+        this.scroll && this.scroll.refresh()
       }
     }
   }

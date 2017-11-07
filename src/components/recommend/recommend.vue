@@ -1,9 +1,9 @@
 <template>
   <div class="recommend">
-    <v-scroll class="recommend-content" :data="discList">
+    <v-scroll class="recommend-content" :data="discList" ref="scroll">
       <div>
         <div v-if="recommends.length" class="slider-wrapper">
-          <v-slider>
+          <v-slider :data="recommends">
             <div v-for="item in recommends">
               <a :href="item.linkUrl">
                 <img :src="item.picUrl">
@@ -16,7 +16,7 @@
           <ul>
             <li v-for="item in discList" class="item">
               <div class="icon">
-                <img :src="item.imgurl" width="60" height="60">
+                <img height="60" v-lazy="item.imgurl">
               </div>
               <div class="text">
                 <h2 class="title" v-html="item.creator.name"></h2>
