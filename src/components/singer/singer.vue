@@ -57,7 +57,7 @@
           })
         })
         // 最终得到 map: {hot:{title:'热门', items:[]}, A:{title:'A', items:[]}}
-        // 最后将 map 按照 A -> Z 排序
+        // 最后将 map 对象 处理为有序数组（按照 A -> Z 排序）
         let ret = []
         let hot = []
         for (let key in map) {

@@ -14,6 +14,14 @@
       click: {
         type: Boolean,
         dafault: true
+      },
+      probeType: {
+        type: Number,
+        default: 1
+      },
+      listenScroll: {
+        type: Boolean,
+        default: true
       }
     },
     mounted () {
@@ -35,14 +43,27 @@
         }
         this.scroll = new BScroll(this.$refs.wrapper, {
           click: true,
-          probeType: 3
+          probeType: this.probeType
         })
-        this.scroll.on('scroll', (pos) => {
-          this.$emit('scrollY', pos.y)
-        })
+
+        if (this.listenScroll) {
+          let _this = this
+          this.scroll.on('scroll', (pos) => {
+            _this.$emit('scroll', pos)
+          })
+        }
+      },
+      disable () {
+        this.scroll && this.scroll.disable()
+      },
+      enable () {
+        this.scroll && this.scroll.enable()
       },
       refresh () {
         this.scroll && this.scroll.refresh()
+      },
+      scrollToElement () {
+        this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)   // 因为在父组件组件中调用此方法时上下文不是 this.scroll，所以用 apply 改变上下文
       }
     }
   }
