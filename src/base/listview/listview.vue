@@ -1,10 +1,10 @@
 <template>
-  <scroll class="listview" :data="data" ref="listview" @scroll="scroll" :listenScroll="listenScroll" :probeType="probeType">
+  <v-scroll class="listview" :data="data" ref="listview" @scroll="scroll" :listenScroll="listenScroll" :probeType="probeType">
     <ul>
       <li v-for="group in data" class="list-group" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li v-for="item in group.items" class="list-group-item">
+          <li v-for="item in group.items" class="list-group-item" @click="select(item)">
             <img v-lazy="item.avatar" class="avatar">
             <span class="name">{{item.name}}</span>
           </li>
@@ -18,12 +18,16 @@
     </div>
     <div class="list-fixed" v-show="listFixed" ref="fixedTop">
       <h2 class="fixed-title">{{listFixed}}</h2>
-    </div>  
-  </scroll>
+    </div>
+    <div class="loading-container" v-show="!data">
+      <v-loading></v-loading>
+    </div>
+  </v-scroll>
 </template>
 <script>
   import scroll from 'base/scroll/scroll'
   import {getData} from 'common/js/dom'
+  import loading from 'base/loading/loading'
 
   const ANCHOR_HEIGHT = 18  // 字体大小 + 上下 padding
   const TITLE_HEIGHT = 30
@@ -69,6 +73,12 @@
       },
       diff (newVal) {
         let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
+        // 减少 DOM 操作
+        if (this.fixedTop === fixedTop) {
+          return
+        }
+        this.fixedTop = fixedTop
+
         this.$refs.fixedTop.style.transform = `translate3d(0,${fixedTop}px,0)`
       }
     },
@@ -100,8 +110,9 @@
       // 滚动联动
       onshortcuttouchmove (e) {
         this.touch.y2 = e.touches[0].pageY  // touchmove 时的 Y 坐标
-        // console.log(this.touch.y1, this.touch.y2)
-        let detal = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0   // touchmove 的偏移量 除以 锚点的高度 得到滚动的锚点的个数也就是索引值
+
+        // touchmove 的偏移量除以锚点的高度 得到滚动的锚点的个数
+        let detal = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0
         let anchorIndex = parseInt(this.touch.anchorIndex) + detal
 
         this._scrollTo(anchorIndex)
@@ -133,10 +144,14 @@
       },
       scroll (pos) {
         this.scrollY = pos.y
+      },
+      select (item) {
+        this.$emit('select', item)
       }
     },
     components: {
-      scroll
+      'v-scroll': scroll,
+      'v-loading': loading
     }
   }
 </script>
@@ -200,5 +215,10 @@
         padding-left: 20px
         font-size: $font-size-small
         color: $color-text-l
-        background: $color-highlight-background      
+        background: $color-highlight-background
+      .loading-container
+        position: absolute
+        width: 100%
+        top: 50%
+        transform: translateY(-50%)
 </style>
