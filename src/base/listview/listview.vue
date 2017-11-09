@@ -1,7 +1,7 @@
 <template>
   <scroll class="listview" :data="data" ref="listview" @scroll="scroll" :listenScroll="listenScroll" :probeType="probeType">
     <ul>
-      <li v-for="group in data" class="list-group  list-group-hook" ref="listGroup">
+      <li v-for="group in data" class="list-group" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
           <li v-for="item in group.items" class="list-group-item">
@@ -15,7 +15,10 @@
       <ul>
         <li v-for="(item, index) in shortcutList" class="item" :data-index="index" :class="{'current': currentIndex === index}">{{item}}</li>
       </ul>
-    </div>   
+    </div>
+    <div class="list-fixed" v-show="listFixed" ref="fixedTop">
+      <h2 class="fixed-title">{{listFixed}}</h2>
+    </div>  
   </scroll>
 </template>
 <script>
@@ -23,6 +26,7 @@
   import {getData} from 'common/js/dom'
 
   const ANCHOR_HEIGHT = 18  // 字体大小 + 上下 padding
+  const TITLE_HEIGHT = 30
 
   export default {
     props: {
@@ -39,7 +43,9 @@
     },
     data () {
       return {
-        scrollY: 0
+        scrollY: -1,
+        currentIndex: 0,
+        diff: -1
       }
     },
     watch: {
@@ -47,6 +53,23 @@
         setTimeout(() => {
           this._calculateHeight()
         }, 20)
+      },
+      // 监听 scrollY 变化 根据滚动到的区间计算出索引值
+      scrollY (newY) {
+        for (let i = 0; i < this.listHeight.length; i++) {
+          let height1 = this.listHeight[i]
+          let height2 = this.listHeight[i + 1]
+          if ((-newY >= height1 && -newY < height2)) {
+            this.currentIndex = i
+            this.diff = height2 + newY  // 歌手列表高度 - 滚动的 Y 值
+            /// console.log(this.diff)
+            return this.currentIndex
+          }
+        }
+      },
+      diff (newVal) {
+        let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
+        this.$refs.fixedTop.style.transform = `translate3d(0,${fixedTop}px,0)`
       }
     },
     computed: {
@@ -56,15 +79,12 @@
           return group.title.substr(0, 1)
         })
       },
-      currentIndex () {
-        for (let i = 0; i < this.listHeight.length; i++) {
-          let height1 = this.listHeight[i]
-          let height2 = this.listHeight[i + 1]
-          if (!height2 || (this.scrollY >= height1 && this.scrollY < height2)) {
-            return i
-          }
+      // 生成fixed title
+      listFixed () {
+        if (this.scrollY > 0) {
+          return ''
         }
-        return 0
+        return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
       }
     },
     methods: {
@@ -81,17 +101,28 @@
       onshortcuttouchmove (e) {
         this.touch.y2 = e.touches[0].pageY  // touchmove 时的 Y 坐标
         // console.log(this.touch.y1, this.touch.y2)
-        let detal = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0   // touchmove 的偏移量
+        let detal = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0   // touchmove 的偏移量 除以 锚点的高度 得到滚动的锚点的个数也就是索引值
         let anchorIndex = parseInt(this.touch.anchorIndex) + detal
 
         this._scrollTo(anchorIndex)
       },
       _scrollTo (index) {
         this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
+
+        if (!index && index !== 0) {
+          return
+        }
+        if (index < 0) {
+          index = 0
+        } else if (index > this.listHeight.length - 2) {
+          index = this.listHeight.length - 2
+        }
+        // 点击快速入口让 this.scrollY 等于左侧滚动的高度，从而通过 watch 可以监听 this.scrollY 去获取currentIndex，让对应锚点高亮
+        this.scrollY = this.$refs.listview.scroll.y
       },
-      // 歌手列表高度 数组
+      // 计算每个歌手列表高度 数组
       _calculateHeight () {
-        let singerList = document.getElementsByClassName('list-group-hook')
+        let singerList = this.$refs.listGroup
         let height = 0
         this.listHeight.push(height)
         for (let i = 0; i < singerList.length; i++) {
@@ -101,7 +132,7 @@
         }
       },
       scroll (pos) {
-        this.scrollY = Math.abs(Math.round(pos.y))
+        this.scrollY = pos.y
       }
     },
     components: {
@@ -158,4 +189,16 @@
         font-size: $font-size-small
         &.current
           color: $color-theme
+    .list-fixed
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      .fixed-title
+        height: 30px
+        line-height: 30px
+        padding-left: 20px
+        font-size: $font-size-small
+        color: $color-text-l
+        background: $color-highlight-background      
 </style>

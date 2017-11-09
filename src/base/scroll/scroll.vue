@@ -63,7 +63,7 @@
         this.scroll && this.scroll.refresh()
       },
       scrollToElement () {
-        this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)   // 因为在父组件组件中调用此方法时上下文不是 this.scroll，所以用 apply 改变上下文
+        this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)   // 因为在父组件组件中调用此方法时上下文不是 this.scroll，所以用 apply 改变上下文 参数传入 this.scroll
       }
     }
   }
