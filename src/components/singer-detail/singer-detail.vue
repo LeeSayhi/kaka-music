@@ -1,10 +1,23 @@
 <template>
-	<div class="singer-detail"></div>
+	<div class="singer-detail">nnn</div>
 </template>
 <script>
-	
+	import {mapGetters} from 'vuex'
+
+	export default {
+		computed: {
+			...mapGetters([
+				'singer'
+			])
+		},
+		created () {
+			console.log(this.singer)
+		}
+	}
 </script>
 <style lang="stylus">
+	@import "~common/stylus/variable"
+
 	.singer-detail
 		position: fixed
 		top: 0
