@@ -40,7 +40,7 @@
       }
     },
     created () {
-      this.touch = {}  // 定义 touch 对象,，用来存储一些共用属性
+      this.touch = {}  // 定义 touch 对象，用来存储一些共用属性
       this.listHeight = []
       this.listenScroll = true
       this.probeType = 3
