@@ -6,8 +6,9 @@
 </template>
 <script>
   import {getSingerList} from 'api/singer'
-
   import listview from 'base/listview/listview'
+
+  import {mapMutations} from 'vuex'
 
   const HOT_NAME = '热门'
   const HOT_SINGER_LENGTH = 10
@@ -79,7 +80,11 @@
         this.$router.push({
           path: `/singer/${singer.id}`
         })
-      }
+        this.setSinger(singer)
+      },
+      ...mapMutations({
+        setSinger: 'SET_SINGER'
+      })
     },
     components: {
       listview

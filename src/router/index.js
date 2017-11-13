@@ -24,8 +24,8 @@ export default new Router({
       component: singer,
       children: [
         {
-          path: 'id',
-          components: singerDetail
+          path: ':id',
+          component: singerDetail
         }
       ]
     },
