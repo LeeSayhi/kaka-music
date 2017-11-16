@@ -72,18 +72,23 @@
         <div class="control"></div>
       </div>
     </transition>
-    <audio :src="currentSong.url" ref="audio"></audio>
+    <audio :src="currentSong.url" ref="audio" @canplay="canplay" @error="error"></audio>
   </div>
 </template>
 <script>
   import {mapGetters, mapMutations} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
-  import audio from 'simple-audio'
+  // import audio from 'simple-audio'
 
   const transform = prefixStyle('transform')
 
   export default {
+  	data () {
+  		return {
+  			songReady: false  // audio 的 canpaly 事件的标识
+  		}
+  	},
     computed: {
       ...mapGetters([
         'playList',
@@ -184,6 +189,9 @@
       },
       // 下一首
       nextSong () {
+      	if (!this.songReady) {
+      		return
+      	}
         let index = this.currentIndex + 1
         if (index === this.playList.length) {
           index = 0
@@ -191,11 +199,15 @@
         this.setCurrentIndex(index)
 
         if (!this.playing) {
-          this.togglePlaying(true)
+          this.togglePlaying()
         }
+        this.songReady = false
       },
       // 上一首
       prevSong () {
+      	if (!this.songReady) {
+      		return
+      	}
         let index = this.currentIndex - 1
         if (index === -1) {
           index = this.playList.length - 1
@@ -203,18 +215,27 @@
         this.setCurrentIndex(index)
 
         if (!this.playing) {
-          this.togglePlaying(true)
+          this.togglePlaying()
         }
+        this.songReady = false
+      },
+      // 当歌曲可以播放的时候（移动端浏览器监听不到 audio 的 canPlay ？？）
+      canplay () {
+      	this.songReady = true
+      },
+      // 当歌曲加载失败的时候
+      error () {
+      	this.songReady = true
       }
     },
     watch: {
       // 监听歌曲改变， 播放歌曲
       currentSong () {
-        setTimeout(() => {
+        this.$nextTick(() => {
           // 移动端不能自动播放
-          audio.playSound(this.$refs.audio)
+          // audio.playSound(this.$refs.audio)
           this.$refs.audio.play()
-        }, 1000)
+        })
       },
       // 监听 playing，播放 || 暂停
       playing (newPlaying) {
