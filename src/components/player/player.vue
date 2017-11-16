@@ -102,7 +102,7 @@
       },
       // 专辑图片 动画与暂停的 class
       adCls () {
-        return this.playing ? 'play' : 'pause'
+        return this.playing ? 'play' : 'play pause'
       }
     },
     methods: {
