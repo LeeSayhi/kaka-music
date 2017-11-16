@@ -8,7 +8,7 @@
     >
       <div class="normal-player" v-show="fullScreen">
         <div class="background">
-          <img src="" width="100%" height="100%">
+          <img :src="currentSong.image" width="100%" height="100%">
         </div>
         <div class="top">
           <div class="back" @click="back">
@@ -20,7 +20,7 @@
         <div class="middle">
           <div class="middle-l">
             <div class="cd-wrapepr" ref="cdWrapper">
-              <div class="cd">
+              <div class="cd" :class="adCls">
                 <img class="image" :src="currentSong.image">
               </div>
             </div>
@@ -30,40 +30,56 @@
           </div>
         </div>
         <div class="bottom">
-          <div class="dot-wrapper">
+<!--           <div class="dot-wrapper">
             <span class="dot active"></span>
             <span class="dot"></span>
           </div>
           <div class="progress-wrapper">
-            <span class="time time-l"></span>
-            <div class="progress-bar-wrapper">
 
+          </div> -->
+          <div class="operators">
+            <div class="icon icon-left">
+              <i class="icon-sequence"></i>
             </div>
-            <span class="time time-r"></span>
+            <div class="icon icon-left">
+              <i class="icon-prev" @click="prevSong"></i>
+            </div>
+            <div class="icon icon-center">
+              <i :class="playIcon" @click="togglePlaying"></i>
+            </div>
+            <div class="icon icon-right">
+              <i class="icon-next" @click="nextSong"></i>
+            </div>
+            <div class="icon icon-right">
+              <i class="icon-favorite"></i>
+            </div>
           </div>
-          <div class="operators"></div>
         </div>
       </div>
     </transition>
     <transition name="mini">
       <div class="mini-player" v-show="!fullScreen" @click="open">
-        <div class="icon">
+        <div class="icon" :class="adCls">
           <img :src="currentSong.image" width="40" height="40">
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
-        <div class="control"></div>
+        <div class="control">
+          <i class="icon-mini" :class="miniIcon" @click.stop="togglePlaying"></i>
+        </div>
         <div class="control"></div>
       </div>
     </transition>
+    <audio :src="currentSong.url" ref="audio"></audio>
   </div>
 </template>
 <script>
   import {mapGetters, mapMutations} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
+  import audio from 'simple-audio'
 
   const transform = prefixStyle('transform')
 
@@ -72,12 +88,28 @@
       ...mapGetters([
         'playList',
         'fullScreen',
-        'currentSong'
-      ])
+        'currentSong',
+        'playing',
+        'currentIndex'
+      ]),
+      // 全屏 播放 || 暂停 按钮样式切换
+      playIcon () {
+        return this.playing ? 'icon-pause' : 'icon-play'
+      },
+      // mini 播放 || 暂停 按钮样式切换
+      miniIcon () {
+        return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+      },
+      // 专辑图片 动画与暂停的 class
+      adCls () {
+        return this.playing ? 'play' : 'pause'
+      }
     },
     methods: {
       ...mapMutations({
-        setFullScreen: 'SET_FULL_SCREEN'
+        setFullScreen: 'SET_FULL_SCREEN',
+        setPlaying: 'SET_PLAYING_STATE',
+        setCurrentIndex: 'SET_CURRENT_INDEX'
       }),
       back () {
         this.setFullScreen(false)
@@ -145,6 +177,51 @@
       afterLeave () {
         this.$refs.cdWrapper.style.transition = ''
         this.$refs.cdWrapper.style[transform] = ''
+      },
+      // 修改 playing 值 （控制播放 || 暂停）
+      togglePlaying () {
+        this.setPlaying(!this.playing)
+      },
+      // 下一首
+      nextSong () {
+        let index = this.currentIndex + 1
+        if (index === this.playList.length) {
+          index = 0
+        }
+        this.setCurrentIndex(index)
+
+        if (!this.playing) {
+          this.togglePlaying(true)
+        }
+      },
+      // 上一首
+      prevSong () {
+        let index = this.currentIndex - 1
+        if (index === -1) {
+          index = this.playList.length - 1
+        }
+        this.setCurrentIndex(index)
+
+        if (!this.playing) {
+          this.togglePlaying(true)
+        }
+      }
+    },
+    watch: {
+      // 监听歌曲改变， 播放歌曲
+      currentSong () {
+        setTimeout(() => {
+          // 移动端不能自动播放
+          audio.playSound(this.$refs.audio)
+          this.$refs.audio.play()
+        }, 1000)
+      },
+      // 监听 playing，播放 || 暂停
+      playing (newPlaying) {
+        this.$nextTick(() => {
+          const audio = this.$refs.audio
+          newPlaying ? audio.play() : audio.pause()
+        })
       }
     }
   }
@@ -221,6 +298,10 @@
               box-sizing: border-box
               border: 10px solid rgba(255, 255, 255, 0.1)
               border-radius: 50%
+              &.play
+                animation: rotate 20s linear infinite
+              &.pause
+                animation-play-state: paused
               .image
                 position: absolute
                 left: 0
@@ -247,6 +328,23 @@
               width: 20px
               border-radius: 5px
               background: $color-text-ll
+        .operators
+          display: flex
+          align-items: center
+          .icon
+            flex: 1
+            color: $color-theme
+            i
+              font-size: 30px
+          .icon-left
+            text-align: right
+          .icon-center
+            text-align: center
+            padding: 0 20px
+            i
+              font-size: 40px
+          .icon-right
+            text-align: left
       &.normal-enter-active, &.normal-leave-active
         transition: all 0.6s
         .top, .bottom
@@ -277,6 +375,10 @@
         padding: 0 10px 0 20px
         img
           border-radius: 50%
+        &.play
+          animation: rotate 10s linear infinite
+        &.pause
+          animation-play-state: paused
       .text
         display: flex
         flex-direction: column
@@ -291,5 +393,19 @@
         .desc
           no-wrap()
           font-size: $font-size-small
-          color: $color-text-d          
+          color: $color-text-d
+      .control
+        flex: 0 0 30px
+        width: 30px
+        padding: 0 10px
+        .icon-play-mini, .icon-pause-mini
+          font-size: 30px
+          color: $color-theme-d
+        .icon-mini
+          font-size: 32px
+  @keyframes rotate
+    0%
+      transform: rotate(0)
+    100%
+      transform: rotate(360deg)
 </style>
