@@ -79,7 +79,6 @@
   import {mapGetters, mapMutations} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
-  import audio from 'simple-audio'
 
   const transform = prefixStyle('transform')
 
@@ -219,7 +218,6 @@
       // 监听 playing，播放 || 暂停
       playing (newPlaying) {
         this.$nextTick(() => {
-          const audio = this.$refs.audio
           newPlaying ? audio.play() : audio.pause()
         })
       }
