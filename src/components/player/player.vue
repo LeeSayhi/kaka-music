@@ -37,7 +37,7 @@
           <div class="progress-wrapper">
             <span class="time time-l">{{formatTime(currentTime)}}</span>
             <div class="progress-bar-wrapper">
-              <progress-bar :percent="percent"></progress-bar>
+              <progress-bar :percent="percent" @percentChange="percentChange"></progress-bar>
             </div>
             <span class="time time-r">{{formatTime(currentSong.duration)}}</span>
           </div>
@@ -71,7 +71,7 @@
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <i class="icon-mini" :class="miniIcon" @click.stop="togglePlaying"></i>
+	        <i class="icon-mini" :class="miniIcon" @click.stop="togglePlaying"></i>
         </div>
         <div class="control"></div>
       </div>
@@ -84,6 +84,7 @@
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
   import ProgressBar from 'base/progress-bar/progress-bar'
+  // import ProgressCircle from 'base/progress-circle/progress-circle'
 
   const transform = prefixStyle('transform')
 
@@ -255,6 +256,15 @@
           len++
         }
         return num
+      },
+      // 根据拖动距离的比例来计算播放的时间进度
+      percentChange (percent) {
+      	const currentTime = this.currentSong.duration * percent
+      	this.$refs.audio.currentTime = currentTime
+
+      	if (!this.playing) {
+      		this.togglePlaying()
+      	}
       }
     },
     watch: {
