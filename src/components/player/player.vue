@@ -43,7 +43,7 @@
           </div>
           <div class="operators">
             <div class="icon icon-left">
-              <i class="icon-sequence"></i>
+              <i :class="modeIcon" @click="toggleMode"></i>
             </div>
             <div class="icon icon-left">
               <i class="icon-prev" @click="prevSong"></i>
@@ -78,7 +78,7 @@
         <div class="control"></div>
       </div>
     </transition>
-    <audio :src="currentSong.url" ref="audio" @play="play" @error="error" @timeupdate="timeupdate"></audio>
+    <audio :src="currentSong.url" ref="audio" @play="play" @error="error" @timeupdate="timeupdate" @ended="ended"></audio>
   </div>
 </template>
 <script>
@@ -87,6 +87,8 @@
   import {prefixStyle} from 'common/js/dom'
   import ProgressBar from 'base/progress-bar/progress-bar'
   import ProgressCircle from 'base/progress-circle/progress-circle'
+  import {playMode} from 'common/js/config'
+  import {shuffle} from 'common/js/util'
 
   const transform = prefixStyle('transform')
 
@@ -103,7 +105,9 @@
         'fullScreen',
         'currentSong',
         'playing',
-        'currentIndex'
+        'currentIndex',
+        'mode',
+        'sequenceList'
       ]),
       // 播放时间的进度比
       percent () {
@@ -120,13 +124,19 @@
       // 专辑图片 动画与暂停的 class
       adCls () {
         return this.playing ? 'play' : 'play pause'
+      },
+      // 播放模式 按钮样式切换
+      modeIcon () {
+        return this.mode === playMode.sequence ? 'icon-sequence' : (this.mode === playMode.loop ? 'icon-loop' : 'icon-random')
       }
     },
     methods: {
       ...mapMutations({
         setFullScreen: 'SET_FULL_SCREEN',
         setPlaying: 'SET_PLAYING_STATE',
-        setCurrentIndex: 'SET_CURRENT_INDEX'
+        setCurrentIndex: 'SET_CURRENT_INDEX',
+        setPlayMode: 'SET_PLAY_MODE',
+        setPlaylist: 'SET_PLAY_LIST'
       }),
       back () {
         this.setFullScreen(false)
@@ -239,6 +249,18 @@
       error () {
       	this.songReady = true
       },
+      ended () {
+        if (this.mode === playMode.loop) {
+          this.loop()
+        } else {
+          this.nextSong()
+        }
+      },
+      // 单曲循环
+      loop () {
+        this.$refs.audio.currentTime = 0
+        this.$refs.audio.play()
+      },
       // 当前播放的时间（时间戳）
       timeupdate (e) {
         this.currentTime = e.target.currentTime
@@ -267,11 +289,37 @@
       	if (!this.playing) {
       		this.togglePlaying()
       	}
+      },
+      // 切换播放模式
+      toggleMode () {
+        const mode = (this.mode + 1) % 3
+        this.setPlayMode(mode)
+
+        let list = null
+        if (mode === playMode.random) {
+          list = shuffle(this.sequenceList)
+        } else {
+          list = this.sequenceList
+        }
+
+        this.resetCurrentIndex(list)
+        this.setPlaylist(list)
+      },
+      // 顺序列表里的歌曲对应到随机列表里是哪首歌，并返回它的索引
+      resetCurrentIndex (list) {
+        let index = list.findIndex((item) => {
+          return item.id === this.currentSong.id
+        })
+
+        this.setCurrentIndex(index)
       }
     },
     watch: {
       // 监听歌曲改变， 播放歌曲
-      currentSong () {
+      currentSong (newSaong, oldSong) {
+        if (newSaong.id === oldSong.id) {
+          return
+        }
         this.$nextTick(() => {
           this.$refs.audio.play()
         })
@@ -282,11 +330,6 @@
           let audio = this.$refs.audio
           newPlaying ? audio.play() : audio.pause()
         })
-      },
-      currentTime (newTime) {
-        if (newTime > this.currentSong.duration) {
-          this.nextSong()
-        }
       }
     },
     components: {
