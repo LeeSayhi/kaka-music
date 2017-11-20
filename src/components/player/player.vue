@@ -28,6 +28,13 @@
               <div class="playing-lyric"></div>
             </div>
           </div>
+          <div class="middle-r">
+            <v-scroll class="lyric-wrapper" :data="currentLyric && currentLyric.lines">
+              <div>
+                <p class="text" v-for="(line, index) in currentLyric.lines" :class="{'current': currentLineNum === index}">{{line.txt}}</p>
+              </div>
+            </v-scroll>
+          </div>
         </div>
         <div class="bottom">
           <div class="dot-wrapper">
@@ -89,6 +96,10 @@
   import ProgressCircle from 'base/progress-circle/progress-circle'
   import {playMode} from 'common/js/config'
   import {shuffle} from 'common/js/util'
+  import {getLyric} from 'api/song'
+  import Scroll from 'base/scroll/scroll'
+  import {Base64} from 'js-base64'
+  import Lyric from 'lyric-parser'
 
   const transform = prefixStyle('transform')
 
@@ -96,7 +107,10 @@
   	data () {
   		return {
   			songReady: false,  // audio 的 canpaly 事件的标识
-        currentTime: 0
+        currentTime: 0,
+        currentLyric: null,
+        currentLineNum: 0,
+        playingLyric: ''
   		}
   	},
     computed: {
@@ -312,6 +326,22 @@
         })
 
         this.setCurrentIndex(index)
+      },
+      getLyric (mid) {
+        getLyric(mid).then((res) => {
+          if (!this.currentLyric) {
+            let lyric = Base64.decode(res.lyric)
+            this.currentLyric = new Lyric(lyric, this.handler)
+            if (this.playing) {
+              this.$nextTick(() => {
+                this.currentLyric.play()
+              })
+            }
+          }
+        })
+      },
+      handler ({lineNum, txt}) {
+        this.currentLineNum = lineNum
       }
     },
     watch: {
@@ -321,6 +351,7 @@
           return
         }
         this.$nextTick(() => {
+          this.getLyric(newSaong.mid)
           this.$refs.audio.play()
         })
       },
@@ -334,7 +365,8 @@
     },
     components: {
       'progress-bar': ProgressBar,
-      'progress-circle': ProgressCircle
+      'progress-circle': ProgressCircle,
+      'v-scroll': Scroll
     }
   }
 </script>
@@ -395,6 +427,7 @@
         white-space: nowrap
         .middle-l
           position: relative
+          display: inline-block
           width: 100%
           height: 0
           padding-top: 80%
@@ -421,6 +454,23 @@
                 width: 100%
                 height: 100%
                 border-radius: 50%
+        .middle-r
+          display: inline-block
+          vertical-align: top
+          width: 100%
+          height: 100%
+          overflow: hidden
+          .lyric-wrapper
+            width: 80%
+            margin: 0 auto
+            overflow: hidden
+            text-align: center
+            .text
+              line-height: 32px
+              color: $color-text-1
+              font-size: $font-size-medium
+              &.current
+                color: $color-theme
       .bottom
         position: absolute
         bottom: 50px

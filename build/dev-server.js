@@ -42,6 +42,30 @@ apiRouters.get('/getDiscList', function(req, res) {
   })
 })
 
+// QQ 音乐歌词
+apiRouters.get('/getlyric', function (req, res) {
+  var url = 'https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg'
+  axios.get(url, {
+    headers: {
+      Referer: 'https://c.y.qq.com/',
+      Host: 'c.y.qq.com'
+    },
+    params: req.query
+  }).then((response) => {
+    var ret = response.data
+    if (typeof ret === 'string') {
+      var reg = /^\w+\(({[^()]+})\)$/
+      var matches = ret.match(reg)
+      if (matches) {
+        ret = JSON.parse(matches[1])
+      }
+    }
+    res.json(ret)
+  }).catch((e) => {
+    console.log(e)
+  })
+})
+
 app.use('/api', apiRouters)  
 
 const compiler = webpack(webpackConfig)
