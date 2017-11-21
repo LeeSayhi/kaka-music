@@ -17,29 +17,41 @@
           <h1 class="title" v-html="currentSong.name"></h1>
           <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
-        <div class="middle">
-          <div class="middle-l">
+        <div class="middle"
+             @touchstart="lyricTouchStart"
+             @touchmove="lyricTouchMove"
+             @touchend="lyricTouchEnd"
+        >
+          <div class="middle-l" ref="middleL">
             <div class="cd-wrapepr" ref="cdWrapper">
               <div class="cd" :class="adCls">
                 <img class="image" :src="currentSong.image">
               </div>
             </div>
             <div class="playing-lyric-wrapper">
+              <div class="playing-lyric">{{playingLyric}}</div>
+            </div>
+            <div class="playing-lyric-wrapper">
               <div class="playing-lyric"></div>
             </div>
           </div>
-          <div class="middle-r">
-            <v-scroll class="lyric-wrapper" :data="currentLyric && currentLyric.lines">
-              <div>
-                <p class="text" v-for="(line, index) in currentLyric.lines" :class="{'current': currentLineNum === index}">{{line.txt}}</p>
-              </div>
-            </v-scroll>
-          </div>
+          <v-scroll class="middle-r" :data="currentLyricLines && currentLyricLines" ref="lyricList">
+            <div class="lyric-wrapper">
+                <div>
+                  <p 
+                      class="text" 
+                      :class="{'current': currentLineNum === index}"
+                      v-for="(line, index) in currentLyricLines"
+                      ref="lyricLine"
+                  >{{line.txt}}</p>
+                </div>
+            </div>
+          </v-scroll>
         </div>
         <div class="bottom">
           <div class="dot-wrapper">
-            <span class="dot active"></span>
-            <span class="dot"></span>
+            <span class="dot" :class="{'active': currentShow === 'cd'}"></span>
+            <span class="dot" :class="{'active': currentShow === 'lyric'}"></span>
           </div>
           <div class="progress-wrapper">
             <span class="time time-l">{{formatTime(currentTime)}}</span>
@@ -96,12 +108,11 @@
   import ProgressCircle from 'base/progress-circle/progress-circle'
   import {playMode} from 'common/js/config'
   import {shuffle} from 'common/js/util'
-  import {getLyric} from 'api/song'
   import Scroll from 'base/scroll/scroll'
-  import {Base64} from 'js-base64'
   import Lyric from 'lyric-parser'
 
   const transform = prefixStyle('transform')
+  const transitionDuration = prefixStyle('transitionDuration')
 
   export default {
   	data () {
@@ -109,10 +120,15 @@
   			songReady: false,  // audio 的 canpaly 事件的标识
         currentTime: 0,
         currentLyric: null,
+        currentLyricLines: [],
         currentLineNum: 0,
-        playingLyric: ''
+        playingLyric: '',
+        currentShow: 'cd'
   		}
   	},
+    created () {
+      this.touch = {}
+    },
     computed: {
       ...mapGetters([
         'playList',
@@ -222,12 +238,21 @@
       // 修改 playing 值 （控制播放 || 暂停）
       togglePlaying () {
         this.setPlaying(!this.playing)
+
+        if (this.currentLyric) {
+          this.currentLyric.togglePlay()
+        }
       },
       // 下一首
       nextSong () {
       	if (!this.songReady) {
       		return
       	}
+
+        if (this.playList.length === 1) {
+          this.loop()
+        }
+
         let index = this.currentIndex + 1
         if (index === this.playList.length) {
           index = 0
@@ -274,6 +299,10 @@
       loop () {
         this.$refs.audio.currentTime = 0
         this.$refs.audio.play()
+
+        if (this.currentLyric) {
+          this.currentLyric.seek(0)
+        }
       },
       // 当前播放的时间（时间戳）
       timeupdate (e) {
@@ -303,6 +332,10 @@
       	if (!this.playing) {
       		this.togglePlaying()
       	}
+
+        if (this.currentLyric) {
+          this.currentLyric.seek(currentTime * 1000)
+        }
       },
       // 切换播放模式
       toggleMode () {
@@ -327,21 +360,90 @@
 
         this.setCurrentIndex(index)
       },
-      getLyric (mid) {
-        getLyric(mid).then((res) => {
-          if (!this.currentLyric) {
-            let lyric = Base64.decode(res.lyric)
-            this.currentLyric = new Lyric(lyric, this.handler)
-            if (this.playing) {
-              this.$nextTick(() => {
-                this.currentLyric.play()
-              })
-            }
+      // 获取并解析歌词
+      getLyric () {
+        this.currentSong.getLyric().then((lyric) => {
+          this.currentLyric = new Lyric(lyric, this.handleLyric)
+          this.currentLyricLines = this.currentLyric.lines
+
+          if (this.playing) {
+            this.currentLyric.play()
           }
         })
       },
-      handler ({lineNum, txt}) {
+      handleLyric ({lineNum, txt}) {
         this.currentLineNum = lineNum
+
+        // 歌词位置行数 > 5 总是居中
+        if (lineNum > 5) {
+          let centerEl = this.$refs.lyricLine[lineNum - 5]
+          this.$refs.lyricList.scrollToElement(centerEl, 1000)
+        } else {
+          this.$refs.lyricList.scrollTo(0, 0, 1000)
+        }
+        this.playingLyric = txt
+      },
+      lyricTouchStart (e) {
+        this.touch.init = true
+        // 用来判断是不是一次移动
+        this.touch.moved = false
+        this.touch.startX = e.touches[0].pageX
+        this.touch.startY = e.touches[0].pageY
+       },
+      lyricTouchMove (e) {
+        const deltaX = e.touches[0].pageX - this.touch.startX
+        const deltaY = e.touches[0].pageY - this.touch.startY
+        // 如果是纵向滚动就 return
+        if (Math.abs(deltaY) > Math.abs(deltaX)) {
+          return
+        }
+
+        if (!this.touch.moved) {
+          this.touch.moved = true
+        }
+
+        const left = this.currentShow === 'cd' ? 0 : -window.innerWidth
+        const offsetWidth = Math.min(0, Math.max(-window.innerWidth, deltaX + left))
+        this.touch.percent = Math.abs(offsetWidth / window.innerWidth)
+
+        this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`
+        this.$refs.lyricList.$el.style[transitionDuration] = 0
+        this.$refs.middleL.style.opacity = 1 - this.touch.percent
+        this.$refs.middleL.style[transitionDuration] = 0
+      },
+      lyricTouchEnd () {
+        let offsetWidth
+        let time = 300
+        let opacity // CD 的透明度
+
+        // 移动距离 > 屏幕的 10% 就 全部移过来
+        if (this.currentShow === 'cd') {
+          if (this.touch.percent > 0.1) {
+            offsetWidth = -window.innerWidth
+
+            this.currentShow = 'lyric'
+            opacity = 0
+          } else {
+            offsetWidth = 0
+            opacity = 1
+          }
+        } else {
+          if (this.touch.percent < 0.9) {
+            offsetWidth = 0
+
+            this.currentShow = 'cd'
+            opacity = 1
+          } else {
+            offsetWidth = -window.innerWidth
+            opacity = 0
+          }
+        }
+
+        this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+        this.$refs.lyricList.$el.style[transitionDuration] = `${time}ms`
+        this.$refs.middleL.style.opacity = opacity
+        this.$refs.middleL.style[transitionDuration] = `${time}ms`
+        this.touch.init = false
       }
     },
     watch: {
@@ -350,15 +452,21 @@
         if (newSaong.id === oldSong.id) {
           return
         }
-        this.$nextTick(() => {
-          this.getLyric(newSaong.mid)
+        setTimeout(() => {
+          this.getLyric()
           this.$refs.audio.play()
-        })
+        }, 1000)
+
+        if (this.currentLyric) {
+          this.currentLyric.stop()
+          this.currentTime = 0
+          this.currentLineNum = 0
+        }
       },
       // 监听 playing，播放 || 暂停
       playing (newPlaying) {
+        let audio = this.$refs.audio
         this.$nextTick(() => {
-          let audio = this.$refs.audio
           newPlaying ? audio.play() : audio.pause()
         })
       }
@@ -454,6 +562,16 @@
                 width: 100%
                 height: 100%
                 border-radius: 50%
+          .playing-lyric-wrapper
+            width: 80%
+            margin: 30px auto 0 auto
+            overflow: hidden
+            text-align: center
+            .playing-lyric
+              height: 20px
+              line-height: 20px
+              font-size: $font-size-midium
+              color: $color-text-l
         .middle-r
           display: inline-block
           vertical-align: top

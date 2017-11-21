@@ -1,5 +1,10 @@
+import {getLyric} from 'api/song'
+import {Base64} from 'js-base64'
+import {ERR_OK} from 'api/config'
+
 // 定义一个 Song 类
 class Song {
+	// 获取歌曲的属性
 	constructor ({id, mid, singer, name, album, duration, image, url}) {
 		this.id = id
 		this.mid = mid
@@ -9,6 +14,23 @@ class Song {
 		this.duration = duration
 		this.image = image
 		this.url = url
+	}
+	// 获取歌词的方法
+	getLyric () {
+		if (this.lyric) {
+			return Promise.resolve(this.lyric)
+		}
+
+    return new Promise((resolve, reject) => {
+      getLyric(this.mid).then((res) => {
+        if (res.retcode === ERR_OK) {
+          this.lyric = Base64.decode(res.lyric)
+          resolve(this.lyric)
+        } else {
+          reject(new Error('no lyric'))
+        }
+      })
+    })
 	}
 }
 
