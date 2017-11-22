@@ -5,7 +5,7 @@
 			</slot>			
 		</div>
 		<div class="dots">
-			<span class="dot" v-for="(dot, index) in dots" :class="{active: currentIndex === index}"></span>
+			<span class="dot" v-for="(dot, index) in dots" :class="{active: currentPageIndex === index}"></span>
 		</div>
 	</div>
 </template>
@@ -17,7 +17,7 @@
 	  data () {
 	    return {
 	      dots: [],
-	      currentIndex: 0
+	      currentPageIndex: 0
 	    }
 	  },
 	  props: {
@@ -61,10 +61,7 @@
   			this._play()
   		}
 	  },
-	  deactivated () {
-	  	clearTimeout(this.timer)
-	  },
-    beforeDestroy () {
+ 		destroyed () {
       clearTimeout(this.timer)
     },
 	  methods: {
@@ -109,18 +106,15 @@
             speed: 400
           }
 	    	})
-	    	// 监听BScroll滚动结束事件获取当前元素索引
-	    	this.slider.on('scrollEnd', () => {
-	    		let pageIndex = this.slider.getCurrentPage().pageX
-	    		if (this.loop) {
-	    			pageIndex -= 1
-	    		}
-	    		this.currentIndex = pageIndex
 
+	    	this.slider.on('scrollEnd', this._onscrollEnd)
+
+	    	this.slider.on('touchend', () => {
 	    		if (this.autoPlay) {
 	    			this._play()
 	    		}
 	    	})
+
 	    	// 监听滚动（手动）开始之前事件，如果是自动轮播就清除
         this.slider.on('beforeScrollStart', () => {
           if (this.autoPlay) {
@@ -128,15 +122,24 @@
           }
         })
 	    },
+    	// BScroll滚动结束 获取当前元素索引
+    	_onscrollEnd () {
+    		let pageIndex = this.slider.getCurrentPage().pageX
+    		if (this.loop) {
+    			pageIndex -= 1
+    		}
+    		this.currentPageIndex = pageIndex
+    		if (this.autoPlay) {
+    			this._play()
+    		}
+    	},
     	// 自动轮播
     	_play () {
-    		let pageIndex = this.currentIndex + 1
-    		if (this.loop) {
-    			pageIndex += 1
-    		}
-    		this.timer = setTimeout(() => {
-    			this.slider.goToPage(pageIndex, 0, 400)
-    		}, this.interval)
+    		let pageIndex = this.slider.getCurrentPage().pageX + 1
+    		clearTimeout(this.timer)
+        this.timer = setTimeout(() => {
+          this.slider.goToPage(pageIndex, 0, 400)
+        }, this.interval)
     	}
 		}
 	}
