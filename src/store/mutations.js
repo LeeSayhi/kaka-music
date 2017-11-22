@@ -21,6 +21,10 @@ const mutations = {
   },
   [types.SET_CURRENT_INDEX] (state, index) {
     state.currentIndex = index
+  },
+  /* 推荐 */
+  [types.SET_DISC] (state, disc) {
+    state.disc = disc
   }
 }
 
