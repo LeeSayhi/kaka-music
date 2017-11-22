@@ -5,6 +5,10 @@
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
+<!--       <div class="play">
+        <i class="icon-play"></i>
+        <span class="text">随机播放全部</span>
+      </div> -->
       <div class="filter" ref="filter"></div>
     </div>
     <div class="bg-layer" ref="layer"></div>
@@ -23,14 +27,15 @@
   import Scroll from 'base/scroll/scroll'
   import {prefixStyle} from 'common/js/dom'
   import Loading from 'base/loading/loading'
-
   import {mapActions} from 'vuex'
+  import {playlistMixin} from 'common/js/mixin'
 
   const TITLE_HEIGHT = 40
   const transform = prefixStyle('transform')
   const backdropFilter = prefixStyle('backdrop-filter')
 
   export default {
+    mixins: [playlistMixin],
     props: {
       bgImage: {
         type: String,
@@ -83,7 +88,12 @@
       },
       ...mapActions([
         'selectPlay'
-      ])
+      ]),
+      handlePlaylist (playList) {
+        const bottom = playList.length > 0 ? '60px' : 0
+        this.$refs.list.$el.style.bottom = bottom
+        this.$refs.list.refresh()
+      }
     },
     watch: {
       // 监听 scrollY 变化，去改变图片的高度大小等。

@@ -9,11 +9,11 @@
     props: {
       data: {
         type: Array,
-        dafault: null
+        default: null
       },
       click: {
         type: Boolean,
-        dafault: true
+        default: true
       },
       probeType: {
         type: Number,
@@ -25,14 +25,14 @@
       }
     },
     mounted () {
-      setTimeout(() => {
+      this.$nextTick(() => {
         this._initScroll()
-      }, 20)
+      })
     },
     watch: {
       data () {
         setTimeout(() => {
-          this.scroll.refresh()
+          this.refresh()
         }, 20)
       }
     },
@@ -42,7 +42,7 @@
           return
         }
         this.scroll = new BScroll(this.$refs.wrapper, {
-          click: true,
+          click: this.click,
           probeType: this.probeType
         })
 
@@ -62,11 +62,12 @@
       refresh () {
         this.scroll && this.scroll.refresh()
       },
-      scrollToElement () {
-        this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)   // 因为在父组件组件中调用此方法时上下文不是 this.scroll，所以用 apply 改变上下文 参数传入 this.scroll
-      },
       scrollTo () {
         this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+      },
+      // 因为在父组件组件中调用此方法时上下文不是 this.scroll，所以用 apply 改变上下文 参数传入 this.scroll
+      scrollToElement () {
+        this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
       }
     }
   }

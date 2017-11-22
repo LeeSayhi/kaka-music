@@ -1,19 +1,21 @@
 <template>
-  <div class="singer">
-    <listview :data="singerList" @select="selectSinger"></listview>
+  <div class="singer" ref="singer">
+    <listview :data="singerList" @select="selectSinger" ref="listview"></listview>
     <router-view></router-view>
   </div>
 </template>
 <script>
   import {getSingerList} from 'api/singer'
   import listview from 'base/listview/listview'
-
   import {mapMutations} from 'vuex'
+
+  import {playlistMixin} from 'common/js/mixin'
 
   const HOT_NAME = '热门'
   const HOT_SINGER_LENGTH = 10
 
   export default {
+    mixins: [playlistMixin],
     data () {
       return {
         singerList: []
@@ -84,7 +86,12 @@
       },
       ...mapMutations({
         setSinger: 'SET_SINGER'
-      })
+      }),
+      handlePlaylist (playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+        this.$refs.singer.style.bottom = bottom
+        this.$refs.listview.refresh()
+      }
     },
     components: {
       listview

@@ -1,9 +1,9 @@
 <template>
-  <div class="recommend">
+  <div class="recommend" ref="recommend">
     <v-scroll class="recommend-content" :data="discList" ref="scroll">
       <div>
         <div v-if="recommends.length" class="slider-wrapper">
-          <v-slider :data="recommends">
+          <v-slider>
             <div v-for="item in recommends">
               <a :href="item.linkUrl">
                 <img :src="item.picUrl">
@@ -38,8 +38,10 @@
   import Slider from 'base/slider/slider'
   import Scroll from 'base/scroll/scroll'
   import Loading from 'base/loading/loading'
+  import {playlistMixin} from 'common/js/mixin'
 
   export default {
+    mixins: [playlistMixin],
     data () {
       return {
         recommends: [],
@@ -48,7 +50,7 @@
     },
     created () {
       this._getRecommend()
-      this._getDsicList()
+      this._getDiscList()
     },
     methods: {
       // 轮播图数据
@@ -60,12 +62,18 @@
         })
       },
       // 推荐列表数据
-      _getDsicList () {
+      _getDiscList () {
         getDiscList().then((res) => {
           if (res.code === ERR_OK) {
             this.discList = res.data.list
           }
         })
+      },
+      // mini 播放器时 重新计算 scroll 高度
+      handlePlaylist (playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+        this.$refs.recommend.style.bottom = bottom
+        this.$refs.scroll.refresh()
       }
     },
     components: {
