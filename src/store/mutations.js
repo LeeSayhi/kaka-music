@@ -25,6 +25,10 @@ const mutations = {
   /* 推荐 */
   [types.SET_DISC] (state, disc) {
     state.disc = disc
+  },
+  /* 排行 */
+  [types.SET_TOP_LIST] (state, list) {
+    state.topList = list
   }
 }
 

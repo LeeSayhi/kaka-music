@@ -14,3 +14,6 @@ export const SET_CURRENT_INDEX = 'SET_CURRENT_INDEX'
 
 /* 推荐 */
 export const SET_DISC = 'SET_DISC'
+
+/* 排行 */
+export const SET_TOP_LIST = 'SET_TOP_LIST'
