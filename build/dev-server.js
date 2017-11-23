@@ -66,6 +66,22 @@ apiRouters.get('/getlyric', function (req, res) {
   })
 })
 
+// 推荐歌单
+apiRouters.get('/getSongList', function(req, res) {
+  var url = 'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg'
+  axios.get(url, {
+    headers: {
+      Referer: 'https://c.y.qq.com/',
+      Host: 'c.y.qq.com' 
+    },
+    params: req.query
+  }).then((response) => {
+    res.json(response.data)
+  }).catch((e) => {
+    console.log(e)
+  })
+})
+
 app.use('/api', apiRouters)  
 
 const compiler = webpack(webpackConfig)
