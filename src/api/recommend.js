@@ -39,7 +39,7 @@ export function getDiscList () {
 }
 
 // 推荐歌单
-export function getSongList (disstid, num) {
+export function getSongList (disstid) {
   let url = 'api/getSongList'
 
   const data = Object.assign({}, commonParams, {
@@ -55,7 +55,7 @@ export function getSongList (disstid, num) {
     picmid: 1,
     nosing: 0,
     song_begin: 0,
-    song_num: num,
+    song_num: 100,
     format: 'json'
   })
 

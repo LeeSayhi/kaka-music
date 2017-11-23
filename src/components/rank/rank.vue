@@ -1,9 +1,87 @@
 <template>
-  <div class="rank">rank</div>
+  <div class="rank">
+    <v-scroll class="top-list" :data="topList">
+      <ul>
+        <li class="item" v-for="item in topList">
+          <div class="icon">
+            <img v-lazy="item.picUrl" width="100" height="100">
+          </div>
+          <ul class="song-list">
+            <li class="song" v-for="song in item.songList">
+              <span>{{song.singername}}</span>
+              <span>{{song.songname}}</span>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </v-scroll>>
+  </div>
 </template>
 <script>
-  
+  import {getTopList} from 'api/rank'
+  import {ERR_OK} from 'api/config'
+  import Scroll from 'base/scroll/scroll'
+
+  export default {
+    data () {
+      return {
+        topList: []
+      }
+    },
+    created () {
+      this._getTopList()
+    },
+    methods: {
+      _getTopList () {
+        getTopList().then((res) => {
+          if (res.code === ERR_OK) {
+            this.topList = res.data.topList
+            console.log(this.topList)
+          }
+        })
+      }
+    },
+    components: {
+      'v-scroll': Scroll
+    }
+  }
 </script>
 <style lang="stylus">
-  
+  @import "~common/stylus/variable"
+  @import "~common/stylus/mixin"
+
+  .rank
+    position: fixed
+    width: 100%
+    top: 88px
+    bottom: 0
+    .top-list
+      height: 100%
+      overflow: hidden
+      .item
+        display: flex
+        margin: 0 20px
+        padding-top: 20px
+        height: 100px
+        &:last-child
+          padding-bottom: 20px
+        .icon
+          flex: 0 0 100px
+          width: 100px
+          height: 100px
+        .song-list
+          flex: 1
+          display: flex
+          flex-direction: column
+          justify-content: center
+          padding: 0 20px
+          height: 100px
+          overflow: hidden
+          background: $color-highlight-background
+          color: $color-text-d
+          font-size: $font-size-small
+          .song
+            no-wrap()
+            line-height: 26px
+            
 </style>

@@ -36,8 +36,7 @@
           this.$router.push('/recommend')
           return
         }
-        const num = 15
-        getSongList(this.disc.dissid, num).then((res) => {
+        getSongList(this.disc.dissid).then((res) => {
           if (res.code === ERR_OK) {
             this.songs = this._normalizeSinger(res.cdlist[0].songlist)
           }
