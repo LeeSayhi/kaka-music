@@ -1,6 +1,6 @@
 <template>
-  <div class="rank">
-    <v-scroll class="top-list" :data="topList">
+  <div class="rank" ref="rank">
+    <v-scroll class="top-list" :data="topList" ref="topList">
       <ul>
         <li class="item" v-for="item in topList" @click="selectItem(item)">
           <div class="icon">
@@ -14,6 +14,9 @@
           </ul>
         </li>
       </ul>
+      <div class="loading-container" v-show="!topList.length">
+        <v-loading></v-loading>
+      </div>
     </v-scroll>
     <router-view></router-view>
   </div>
@@ -23,8 +26,11 @@
   import {ERR_OK} from 'api/config'
   import Scroll from 'base/scroll/scroll'
   import {mapMutations} from 'vuex'
+  import {playlistMixin} from 'common/js/mixin'
+  import Loading from 'base/loading/loading'
 
   export default {
+    mixins: [playlistMixin],
     data () {
       return {
         topList: []
@@ -50,10 +56,16 @@
       },
       ...mapMutations({
         setTopList: 'SET_TOP_LIST'
-      })
+      }),
+      handlePlaylist (playList) {
+        const bottom = playList.length > 0 ? '60px' : ''
+        this.$refs.rank.style.bottom = bottom
+        this.$refs.topList.refresh()
+      }
     },
     components: {
-      'v-scroll': Scroll
+      'v-scroll': Scroll,
+      'v-loading': Loading
     }
   }
 </script>
@@ -94,5 +106,9 @@
           .song
             no-wrap()
             line-height: 26px
-            
+      .loading-container
+        position: absolute
+        width: 100%
+        top: 50%
+        transform: translateY(-50%)
 </style>
