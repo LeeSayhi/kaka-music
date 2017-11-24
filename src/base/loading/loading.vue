@@ -14,7 +14,7 @@
     }
   }
 </script>
-<style lang="stylus">
+<style scoped lang="stylus">
   .loading
     width: 100%
     text-align: center

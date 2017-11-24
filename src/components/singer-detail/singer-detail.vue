@@ -61,7 +61,7 @@
 		}
 	}
 </script>
-<style lang="stylus">
+<style scoped lang="stylus">
 	@import "~common/stylus/variable"
 
 	.slide-enter-active, .slide-leave-active

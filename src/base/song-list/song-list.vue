@@ -16,6 +16,10 @@
       songs: {
         type: Array,
         default: []
+      },
+      rank: {
+        type: Boolean,
+        default: true
       }
     },
     methods: {
@@ -28,7 +32,7 @@
     }
   }
 </script>
-<style lang="stylus">
+<style scoped lang="stylus">
   @import "~common/stylus/variable"
   @import "~common/stylus/mixin"
   

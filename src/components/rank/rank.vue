@@ -7,9 +7,9 @@
             <img v-lazy="item.picUrl" width="100" height="100">
           </div>
           <ul class="song-list">
-            <li class="song" v-for="song in item.songList">
-              <span>{{song.singername}}</span>
-              <span>{{song.songname}}</span>
+            <li class="song" v-for="(song, index) in item.songList">
+              <span>{{index + 1}}</span>
+              <span>{{song.songname}}-{{song.singername}}</span>
             </li>
           </ul>
         </li>
@@ -69,7 +69,7 @@
     }
   }
 </script>
-<style lang="stylus">
+<style scoped lang="stylus">
   @import "~common/stylus/variable"
   @import "~common/stylus/mixin"
 

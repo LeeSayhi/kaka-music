@@ -7,7 +7,7 @@
 <script>
   
 </script>
-<style lang="stylus">
+<style scoped lang="stylus">
   @import "~common/stylus/variable"
   @import "~common/stylus/mixin"
   
