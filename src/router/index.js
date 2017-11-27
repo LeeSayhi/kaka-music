@@ -48,7 +48,7 @@ export default new Router({
       ]
     },
     {
-      path: 'search',
+      path: '/search',
       component: search
     }
   ]
