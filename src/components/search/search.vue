@@ -1,9 +1,9 @@
 <template>
   <div class="search">
     <div class="search-box-wrapper">
-      <v-searchbox ref="searchBox"></v-searchbox>
+      <v-searchbox ref="searchBox" @query="editQuery"></v-searchbox>
     </div>
-    <div class="shortcut-wrapper">
+    <div class="shortcut-wrapper" v-show="!query">
       <div class="shortcut">
         <div>
           <div class="hot-key">
@@ -25,6 +25,9 @@
         </div>
       </div>
     </div>
+    <div class="search-result" v-show="query">
+      <v-suggest :query="query" :zhida="zhida"></v-suggest>
+    </div>
   </div>
 </template>
 <script>
@@ -32,11 +35,13 @@
   import {getHotKey} from 'api/search.js'
   import {ERR_OK} from 'api/config'
   import Suggest from 'components/suggest/suggest'
- 
+
   export default {
     data () {
       return {
-        hotKey: []
+        hotKey: [],
+        query: '',
+        zhida: true
       }
     },
     created () {
@@ -52,10 +57,17 @@
       },
       addQuery (query) {
         this.$refs.searchBox.setQuery(query)
+      },
+      editQuery (query) {
+        this.query = query
+      },
+      blurInput () {
+        this.$res.searchBox.blur()
       }
     },
     components: {
-      'v-searchbox': SearchBox
+      'v-searchbox': SearchBox,
+      'v-suggest': Suggest
     }
   }
 </script>
@@ -104,4 +116,9 @@
               .icon-clear
                 font-size: $font-size-medium
                 color: $color-text-d
+    .search-result
+      position: fixed
+      width: 100%
+      top: 178px
+      bottom: 0
 </style>
