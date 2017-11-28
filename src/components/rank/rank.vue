@@ -48,8 +48,9 @@
         })
       },
       selectItem (item) {
+        console.log()
         this.$router.push({
-          path: `/rank/${this.topList.id}`
+          path: `/rank/${item.id}`
         })
         this.setTopList(item)
       },
