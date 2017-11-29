@@ -26,7 +26,7 @@
       </div>
     </div>
     <div class="search-result" v-show="query" ref="searchResult">
-      <v-suggest :query="query" @listScroll="blurInput"></v-suggest>
+      <v-suggest :query="query" @listScroll="blurInput" ref="suggest"></v-suggest>
     </div>
     <router-view></router-view>
   </div>
