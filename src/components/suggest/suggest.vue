@@ -1,7 +1,14 @@
 <template>
-  <v-scroll class="suggest" :data="result">
+  <v-scroll ref="suggest"
+            class="suggest" 
+            :data="result"
+            :pullup="pullup"
+            :beforeScroll="beforeScroll"
+            @scrollEnd="searchMore"
+            @beforeScroll="listScroll"
+  >
     <ul class="suggest-list">
-      <li class="suggest-item" v-for="item in result">
+      <li class="suggest-item" v-for="item in result" @click="select(item)">
         <div class="icon">
           <i :class="getIconCls(item)"></i>
         </div>
@@ -9,13 +16,20 @@
           <p class="text" v-html="getDisplayName(item)"></p>
         </div>
       </li>
+      <v-loading v-show="hasMore" title=""></v-loading>
     </ul>
+    <div v-show="!hasMore && !result.length" class="no-result-wrapper">
+      <no-result title="抱歉，暂无搜索结果"></no-result>
+    </div>
   </v-scroll>
 </template>
 <script>
   import {search} from 'api/search'
   import {createSong} from 'common/js/song'
+  import {ERR_OK} from 'api/config'
   import Scroll from 'base/scroll/scroll'
+  import Loading from 'base/loading/loading'
+  import NoResult from 'base/no-result/no-result'
 
   const perpage = 20
   const TYPE_SINGER = 'singer'
@@ -33,7 +47,10 @@
     },
     data () {
       return {
-        result: []
+        result: [],
+        pullup: true,
+        hasMore: true,
+        beforeScroll: true
       }
     },
     watch: {
@@ -42,13 +59,19 @@
       }
     },
     methods: {
+      // 搜索数据
       _search () {
         this.page = 1
+        this.hasMore = true
+        this.$refs.suggest.scrollTo(0, 0)
         search(this.query, this.page, this.showSinger, perpage).then((res) => {
-          this.result = this._getResult(res.data)
-          console.log(this.result)
+          if (res.code === ERR_OK) {
+            this.result = this._getResult(res.data)
+            this._checkMore(res.data)
+          }
         })
       },
+      // 修改搜索歌曲数据结构
       _normalizeSongs (list) {
         let ret = []
         list.forEach((musicData) => {
@@ -58,6 +81,7 @@
         })
         return ret
       },
+      // 歌手与歌曲拼接
       _getResult (data) {
         let ret = []
         if (data.zhida && data.zhida.singerid) {
@@ -67,6 +91,26 @@
           ret = ret.concat(this._normalizeSongs(data.song.list))
         }
         return ret
+      },
+      // 上拉加载更多
+      searchMore () {
+        if (!this.hasMore) {
+          return
+        }
+        this.page++
+        search(this.query, this.page, this.showSinger, perpage).then((res) => {
+          if (res.code === ERR_OK) {
+            this.result = this.result.concat(this._getResult(res.data).splice(1))
+            this._checkMore(res.data)
+          }
+        })
+      },
+      // 当没有更多内容的时候改变标识位值位 false
+      _checkMore (data) {
+        const song = data.song
+        if (!song.list.length || (song.curnum + song.curpage * perpage) > song.totalnum) {
+          this.hasMore = false
+        }
       },
       getIconCls (item) {
         if (item.type === TYPE_SINGER) {
@@ -81,10 +125,16 @@
         } else {
           return `${item.name}-${item.singer}`
         }
+      },
+      // 开始滚动之前
+      listScroll () {
+        this.$emit('listScroll')
       }
     },
     components: {
-      'v-scroll': Scroll
+      'v-scroll': Scroll,
+      'v-loading': Loading,
+      'no-result': NoResult
     }
   }
 </script>
@@ -114,4 +164,9 @@
           overflow: hidden
           .text
             no-wrap()
+      .no-result-wrapper
+        position: absolute
+        width: 100%
+        top: 50%
+        transform: translateY(-50%)
 </style>

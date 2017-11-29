@@ -26,7 +26,7 @@
       </div>
     </div>
     <div class="search-result" v-show="query">
-      <v-suggest :query="query" :zhida="zhida"></v-suggest>
+      <v-suggest :query="query" @listScroll="blurInput"></v-suggest>
     </div>
   </div>
 </template>
@@ -61,8 +61,9 @@
       editQuery (query) {
         this.query = query
       },
+      // 监听 suggest 触发的 beforeScroll 事件，调用 searchBox 的 blur事件
       blurInput () {
-        this.$res.searchBox.blur()
+        this.$refs.searchBox.blur()
       }
     },
     components: {

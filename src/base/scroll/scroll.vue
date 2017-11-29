@@ -22,6 +22,14 @@
       listenScroll: {
         type: Boolean,
         default: true
+      },
+      pullup: {
+        type: Boolean,
+        default: false
+      },
+      beforeScroll: {
+        type: Boolean,
+        default: false
       }
     },
     mounted () {
@@ -45,11 +53,25 @@
           click: this.click,
           probeType: this.probeType
         })
-
+        // 触发滚动位置
         if (this.listenScroll) {
           let _this = this
           this.scroll.on('scroll', (pos) => {
             _this.$emit('scroll', pos)
+          })
+        }
+        // 触发上拉
+        if (this.pullup) {
+          this.scroll.on('scrollEnd', () => {
+            if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
+              this.$emit('scrollEnd')
+            }
+          })
+        }
+
+        if (this.beforeScroll) {
+          this.scroll.on('beforeScrollStart', () => {
+            this.$emit('beforeScroll')
           })
         }
       },
