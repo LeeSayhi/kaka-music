@@ -25,7 +25,7 @@
         </div>
       </div>
     </div>
-    <div class="search-result" v-show="query">
+    <div class="search-result" v-show="query" ref="searchResult">
       <v-suggest :query="query" @listScroll="blurInput"></v-suggest>
     </div>
     <router-view></router-view>
@@ -36,8 +36,10 @@
   import {getHotKey} from 'api/search.js'
   import {ERR_OK} from 'api/config'
   import Suggest from 'components/suggest/suggest'
+  import {playlistMixin} from 'common/js/mixin'
 
   export default {
+    mixins: [playlistMixin],
     data () {
       return {
         hotKey: [],
@@ -65,6 +67,11 @@
       // 监听 suggest 触发的 beforeScroll 事件，调用 searchBox 的 blur事件
       blurInput () {
         this.$refs.searchBox.blur()
+      },
+      handlePlaylist (list) {
+        const bottom = list.length > 0 ? '60px' : 0
+        this.$refs.searchResult.style.bottom = bottom
+        this.$refs.suggest.refresh()
       }
     },
     components: {
