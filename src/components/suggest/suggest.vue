@@ -30,6 +30,8 @@
   import Scroll from 'base/scroll/scroll'
   import Loading from 'base/loading/loading'
   import NoResult from 'base/no-result/no-result'
+  import {mapMutations} from 'vuex'
+  import Singer from 'common/js/singer'
 
   const perpage = 20
   const TYPE_SINGER = 'singer'
@@ -129,7 +131,22 @@
       // 开始滚动之前
       listScroll () {
         this.$emit('listScroll')
-      }
+      },
+      select (item) {
+        if (item.type === TYPE_SINGER) {
+          const singer = new Singer({
+            id: item.singermid,
+            name: item.singername
+          })
+          this.$router.push({
+            path: `/search/${singer.id}`
+          })
+          this.setSinger(singer)
+        }
+      },
+      ...mapMutations({
+        setSinger: 'SET_SINGER'
+      })
     },
     components: {
       'v-scroll': Scroll,
