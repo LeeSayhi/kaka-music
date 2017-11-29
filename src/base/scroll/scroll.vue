@@ -68,7 +68,7 @@
             }
           })
         }
-
+        // 监听开始滚动之前
         if (this.beforeScroll) {
           this.scroll.on('beforeScrollStart', () => {
             this.$emit('beforeScroll')
@@ -81,6 +81,7 @@
       enable () {
         this.scroll && this.scroll.enable()
       },
+      // 重新计算高度
       refresh () {
         this.scroll && this.scroll.refresh()
       },
