@@ -8,7 +8,7 @@
             @beforeScroll="listScroll"
   >
     <ul class="suggest-list">
-      <li class="suggest-item" v-for="(item, index) in result" @click="select(item, index)">
+      <li class="suggest-item" v-for="item in result" @click="select(item)">
         <div class="icon">
           <i :class="getIconCls(item)"></i>
         </div>
@@ -132,7 +132,7 @@
       listScroll () {
         this.$emit('listScroll')
       },
-      select (item, index) {
+      select (item) {
         if (item.type === TYPE_SINGER) {
           const singer = new Singer({
             id: item.singermid,
