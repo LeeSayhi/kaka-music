@@ -383,6 +383,8 @@
         }
         this.playingLyric = txt
       },
+
+      /* 切换所有歌词的显示页面 */
       lyricTouchStart (e) {
         this.touch.init = true
         // 用来判断是不是一次移动

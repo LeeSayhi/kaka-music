@@ -8,7 +8,7 @@
             @beforeScroll="listScroll"
   >
     <ul class="suggest-list">
-      <li class="suggest-item" v-for="item in result" @click="select(item)">
+      <li class="suggest-item" v-for="(item, index) in result" @click="select(item, index)">
         <div class="icon">
           <i :class="getIconCls(item)"></i>
         </div>
@@ -30,7 +30,7 @@
   import Scroll from 'base/scroll/scroll'
   import Loading from 'base/loading/loading'
   import NoResult from 'base/no-result/no-result'
-  import {mapMutations} from 'vuex'
+  import {mapMutations, mapActions} from 'vuex'
   import Singer from 'common/js/singer'
 
   const perpage = 20
@@ -132,7 +132,7 @@
       listScroll () {
         this.$emit('listScroll')
       },
-      select (item) {
+      select (item, index) {
         if (item.type === TYPE_SINGER) {
           const singer = new Singer({
             id: item.singermid,
@@ -142,11 +142,16 @@
             path: `/search/${singer.id}`
           })
           this.setSinger(singer)
+        } else {
+          this.insertSong(item)
         }
       },
       ...mapMutations({
         setSinger: 'SET_SINGER'
       }),
+      ...mapActions([
+        'insertSong'
+      ]),
       refresh () {
         this.$refs.suggest.refresh()
       }
