@@ -145,6 +145,7 @@
         } else {
           this.insertSong(item)
         }
+        this.$emit('select', item)
       },
       ...mapMutations({
         setSinger: 'SET_SINGER'

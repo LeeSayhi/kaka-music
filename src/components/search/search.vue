@@ -26,7 +26,7 @@
       </div>
     </div>
     <div class="search-result" v-show="query" ref="searchResult">
-      <v-suggest :query="query" @listScroll="blurInput" ref="suggest"></v-suggest>
+      <v-suggest :query="query" @listScroll="blurInput" ref="suggest" @select="saveSearch"></v-suggest>
     </div>
     <router-view></router-view>
   </div>
@@ -37,6 +37,7 @@
   import {ERR_OK} from 'api/config'
   import Suggest from 'components/suggest/suggest'
   import {playlistMixin} from 'common/js/mixin'
+  import {mapGetters, mapActions} from 'vuex'
 
   export default {
     mixins: [playlistMixin],
@@ -46,6 +47,11 @@
         query: '',
         zhida: true
       }
+    },
+    computed: {
+      ...mapGetters([
+        'searchHistory'
+      ])
     },
     created () {
       this._getHotKey()
@@ -72,7 +78,13 @@
         const bottom = list.length > 0 ? '60px' : 0
         this.$refs.searchResult.style.bottom = bottom
         this.$refs.suggest.refresh()
-      }
+      },
+      saveSearch () {
+        this.saveSeachHistory(this.query)
+      },
+      ...mapActions([
+        'saveSeachHistory'
+      ])
     },
     components: {
       'v-searchbox': SearchBox,
