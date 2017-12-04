@@ -77,10 +77,12 @@ export const saveSeachHistory = function ({commit}, query) {
 	commit(types.SET_SEARCH_HISTORY, saveSearch(query))
 }
 
+// 删除某一条搜索历史数据
 export const deleteSearchHistory = function ({commit}, query) {
   commit(types.SET_SEARCH_HISTORY, deleteSearch(query))
 }
 
+// 清空搜索历史数据
 export const clearSearchHistory = function ({commit}) {
   commit(types.SET_SEARCH_HISTORY, clearSearch())
 }

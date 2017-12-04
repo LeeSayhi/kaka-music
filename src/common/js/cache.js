@@ -33,6 +33,7 @@ function deleteFromArray (arr, value) {
 	arr.splice(index, 1)
 }
 
+// 添加一条数据到 localstorage
 export function saveSearch (query) {
 	let searches = storage.get(SEARCH_KEY, [])
 	insertArray(searches, query, MAX_LENGTH)
@@ -40,6 +41,7 @@ export function saveSearch (query) {
 	return searches
 }
 
+// 从 localstorage 中删除一条数据
 export function deleteSearch (query) {
 	let searches = storage.get(SEARCH_KEY, [])
 	deleteFromArray(searches, query)
@@ -47,11 +49,13 @@ export function deleteSearch (query) {
 	return searches
 }
 
+// 清空 localstorage
 export function clearSearch () {
 	storage.remove(SEARCH_KEY)
 	return []
 }
 
+// 读取 localstorage
 export function loadSearch () {
 	return storage.get(SEARCH_KEY, [])
 }
