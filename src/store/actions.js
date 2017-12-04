@@ -9,6 +9,12 @@ export const selectPlay = function ({commit, state}, {list, index}) {
   commit(types.SET_PLAYING_STATE, true)
 }
 // 查找当前列表中是否有某首歌曲并返回其索引
+/**
+ * [findIndex description]
+ * @param  {[Array]} list [{id: 1, name: 'a'}, {id: 2, name: 'b'}]
+ * @param  {[Object]} song {id: 1, name: 'a'}
+ * @return {[Number]}      index
+ */
 function findIndex (list, song) {
   return list.findIndex((item) => {
     return item.id === song.id
@@ -43,7 +49,7 @@ export const insertSong = function ({commit, state}, song) {
     }
   }
 
-  // 带插入sequenceList 的位置
+  // 待插入sequenceList 的位置
   let currentSIndex = findIndex(sequenceList, currentSong) + 1
   // sequenceList 中是否有待插入的歌曲
   let fsIndex = findIndex(sequenceList, song)
