@@ -1,4 +1,5 @@
 import * as types from './mutation-types'
+import {saveSearch, deleteSearch, clearSearch} from 'common/js/cache'
 
 // singer 组件 播放歌曲所需数据
 export const selectPlay = function ({commit, state}, {list, index}) {
@@ -69,4 +70,17 @@ export const insertSong = function ({commit, state}, song) {
   commit(types.SET_CURRENT_INDEX, currentIndex)
   commit(types.SET_FULL_SCREEN, true)
   commit(types.SET_PLAYING_STATE, true)
+}
+
+// 搜索历史数据
+export const saveSeachHistory = function ({commit}, query) {
+	commit(types.SET_SEARCH_HISTORY, saveSearch(query))
+}
+
+export const deleteSearchHistory = function ({commit}, query) {
+  commit(types.SET_SEARCH_HISTORY, deleteSearch(query))
+}
+
+export const clearSearchHistory = function ({commit}) {
+  commit(types.SET_SEARCH_HISTORY, clearSearch())
 }

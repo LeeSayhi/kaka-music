@@ -29,6 +29,10 @@ const mutations = {
   /* 排行 */
   [types.SET_TOP_LIST] (state, list) {
     state.topList = list
+  },
+  /* 搜素历史 */
+  [types.SET_SEARCH_HISTORY] (state, query) {
+    state.searchHistory = query
   }
 }
 

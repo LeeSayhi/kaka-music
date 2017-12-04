@@ -14,19 +14,20 @@
               </li>
             </ul>
           </div>
-          <div class="search-history">
+          <div class="search-history" v-show="searchHistory.length">
             <h1 class="title">
               <span class="text">搜索历史</span>
-              <span class="clear">
+              <span class="clear" @click="clear">
                 <i class="icon-clear"></i>
               </span>
             </h1>
+            <v-searchlist :data="searchHistory" @select="addQuery" @delete="deleteItem"></v-searchlist>
           </div>
         </div>
       </div>
     </div>
     <div class="search-result" v-show="query" ref="searchResult">
-      <v-suggest :query="query" @listScroll="blurInput" ref="suggest"></v-suggest>
+      <v-suggest :query="query" @listScroll="blurInput" ref="suggest" @select="saveSearch"></v-suggest>
     </div>
     <router-view></router-view>
   </div>
@@ -37,6 +38,8 @@
   import {ERR_OK} from 'api/config'
   import Suggest from 'components/suggest/suggest'
   import {playlistMixin} from 'common/js/mixin'
+  import SearchList from 'base/search-list/search-list'
+  import {mapGetters, mapActions} from 'vuex'
 
   export default {
     mixins: [playlistMixin],
@@ -46,6 +49,11 @@
         query: '',
         zhida: true
       }
+    },
+    computed: {
+      ...mapGetters([
+        'searchHistory'
+      ])
     },
     created () {
       this._getHotKey()
@@ -72,11 +80,29 @@
         const bottom = list.length > 0 ? '60px' : 0
         this.$refs.searchResult.style.bottom = bottom
         this.$refs.suggest.refresh()
-      }
+      },
+      // 缓存搜索历史
+      saveSearch () {
+        this.saveSeachHistory(this.query)
+      },
+      // 删除当前搜索歌曲
+      deleteItem (item) {
+        this.deleteSearchHistory(item)
+      },
+      // 清空搜索列表
+      clear () {
+        this.clearSearchHistory()
+      },
+      ...mapActions([
+        'saveSeachHistory',
+        'deleteSearchHistory',
+        'clearSearchHistory'
+      ])
     },
     components: {
       'v-searchbox': SearchBox,
-      'v-suggest': Suggest
+      'v-suggest': Suggest,
+      'v-searchlist': SearchList
     }
   }
 </script>
