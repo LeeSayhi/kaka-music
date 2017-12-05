@@ -3,8 +3,8 @@
     <div class="search-box-wrapper">
       <v-searchbox ref="searchBox" @query="editQuery"></v-searchbox>
     </div>
-    <div class="shortcut-wrapper" v-show="!query">
-      <div class="shortcut">
+    <div class="shortcut-wrapper" ref="shortcutWrapper" v-show="!query">
+      <v-scroll class="shortcut" :data="shortcut" ref="shortcut">
         <div>
           <div class="hot-key">
             <h1 class="title">热门搜索</h1>
@@ -24,7 +24,7 @@
             <v-searchlist :data="searchHistory" @select="addQuery" @delete="deleteItem"></v-searchlist>
           </div>
         </div>
-      </div>
+      </v-scroll>
     </div>
     <div class="search-result" v-show="query" ref="searchResult">
       <v-suggest :query="query" @listScroll="blurInput" ref="suggest" @select="saveSearch"></v-suggest>
@@ -42,6 +42,7 @@
   import SearchList from 'base/search-list/search-list'
   import Confirm from 'base/confirm/confirm'
   import {mapGetters, mapActions} from 'vuex'
+  import Scroll from 'base/scroll/scroll'
 
   export default {
     mixins: [playlistMixin],
@@ -55,7 +56,10 @@
     computed: {
       ...mapGetters([
         'searchHistory'
-      ])
+      ]),
+      shortcut () {
+        return this.hotKey.concat(this.searchHistory)
+      }
     },
     created () {
       this._getHotKey()
@@ -78,10 +82,15 @@
       blurInput () {
         this.$refs.searchBox.blur()
       },
+      // 当有 mini 播放存在的时候，重新设置外层容器的 bottom 并重新计算 scroll 高度
       handlePlaylist (list) {
         const bottom = list.length > 0 ? '60px' : 0
+
         this.$refs.searchResult.style.bottom = bottom
         this.$refs.suggest.refresh()
+
+        this.$refs.shortcutWrapper.style.bottom = bottom
+        this.$refs.shortcut.refresh()
       },
       // 缓存搜索历史
       saveSearch () {
@@ -104,11 +113,22 @@
         'clearSearchHistory'
       ])
     },
+    watch: {
+      // 当搜索了某首歌时，切换到搜素主页，DOM 发生变化，重新计算 scroll 高度
+      query (newQuery) {
+        if (!newQuery) {
+          setTimeout(() => {
+            this.$refs.shortcut.refresh()
+          }, 20)
+        }
+      }
+    },
     components: {
       'v-searchbox': SearchBox,
       'v-suggest': Suggest,
       'v-searchlist': SearchList,
-      'v-confirm': Confirm
+      'v-confirm': Confirm,
+      'v-scroll': Scroll
     }
   }
 </script>
