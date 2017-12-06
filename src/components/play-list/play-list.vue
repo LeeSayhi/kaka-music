@@ -14,8 +14,8 @@
             <li :key="item.id" class="item" ref="listItem" v-for="(item, index) in sequenceList" @click="selectSong(item,index)">
               <i class="current" :class="currentIcon(item)"></i>
               <span class="text">{{item.name}}</span>
-              <span class="like">
-                <i class="icon-not-favorite"></i>
+              <span class="like" @click.stop="toggleFavorite(item)">
+                <i :class="favoriteMode(item)"></i>
               </span>
               <span class="delete" @click.stop="deleteOne(item)">
                 <i class="icon-delete"></i>
@@ -50,7 +50,8 @@
         'sequenceList',
         'playList',
         'mode',
-        'currentSong'
+        'currentSong',
+        'favoriteHistory'
       ]),
       modeIcon () {
         return this.mode === playMode.sequence ? 'icon-sequence' : (this.mode === playMode.loop ? 'icon-loop' : 'icon-random')
@@ -61,7 +62,8 @@
     },
     data () {
       return {
-        showFlag: false
+        showFlag: false,
+        favoriteList: []
       }
     },
     methods: {
@@ -130,6 +132,28 @@
       clearList () {
         this.clearSongList()
       },
+      // 根据收藏列表里是否有这条数据，来判断是收藏还是取消收藏
+      toggleFavorite (song) {
+        if (this.isFavorite(song)) {
+          this.deleteFavoriteHistory(song)
+        } else {
+          this.saveFavoriteHistory(song)
+        }
+      },
+      // 收藏、未收藏 icon
+      favoriteMode (song) {
+        if (this.isFavorite(song)) {
+          return 'icon-favorite'
+        }
+        return 'icon-not-favorite'
+      },
+      // 判断是否为已收藏
+      isFavorite (song) {
+        const index = this.favoriteHistory.findIndex((item) => {
+          return song.id === item.id
+        })
+        return index > -1
+      },
       ...mapMutations({
         setPlayMode: 'SET_PLAY_MODE',
         setSequenceList: 'SET_SEQUENCE_LIST',
@@ -139,7 +163,9 @@
       }),
       ...mapActions([
         'deleteSong',
-        'clearSongList'
+        'clearSongList',
+        'saveFavoriteHistory',
+        'deleteFavoriteHistory'
       ])
     },
     watch: {

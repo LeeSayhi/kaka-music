@@ -73,8 +73,8 @@
             <div class="icon icon-right">
               <i class="icon-next" @click="nextSong"></i>
             </div>
-            <div class="icon icon-right">
-              <i class="icon-not-favorite"></i>
+            <div class="icon icon-right" @click.stop="toggleFavorite(currentSong)">
+              <i :class="favoriteMode(currentSong)"></i>
             </div>
           </div>
         </div>
@@ -105,7 +105,7 @@
   </div>
 </template>
 <script>
-  import {mapGetters, mapMutations} from 'vuex'
+  import {mapGetters, mapMutations, mapActions} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
   import ProgressBar from 'base/progress-bar/progress-bar'
@@ -142,7 +142,8 @@
         'playing',
         'currentIndex',
         'mode',
-        'sequenceList'
+        'sequenceList',
+        'favoriteHistory'
       ]),
       // 播放时间的进度比
       percent () {
@@ -284,6 +285,25 @@
           this.togglePlaying()
         }
         this.songReady = false
+      },
+      toggleFavorite (song) {
+        if (this.isFavorite(song)) {
+          this.deleteFavoriteHistory(song)
+        } else {
+          this.saveFavoriteHistory(song)
+        }
+      },
+      favoriteMode (song) {
+        if (this.isFavorite(song)) {
+          return 'icon-favorite'
+        }
+        return 'icon-not-favorite'
+      },
+      isFavorite (song) {
+        const index = this.favoriteHistory.findIndex((item) => {
+          return song.id === item.id
+        })
+        return index > -1
       },
       // 当歌曲可以播放的时候（移动端浏览器监听不到 audio 的 canPlay ？？）
       play () {
@@ -454,7 +474,11 @@
       },
       showPlayList () {
         this.$refs.playList.show()
-      }
+      },
+      ...mapActions([
+        'saveFavoriteHistory',
+        'deleteFavoriteHistory'
+      ])
     },
     watch: {
       // 监听歌曲改变， 播放歌曲
@@ -656,6 +680,8 @@
               font-size: 40px
           .icon-right
             text-align: left
+            .icon-favorite
+              color: $color-sub-theme
       &.normal-enter-active, &.normal-leave-active
         transition: all 0.6s
         .top, .bottom

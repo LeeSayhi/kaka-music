@@ -33,6 +33,10 @@ const mutations = {
   /* 搜素历史 */
   [types.SET_SEARCH_HISTORY] (state, query) {
     state.searchHistory = query
+  },
+  /* 缓存历史 */
+  [types.SET_FAVORITE_HISTORY] (state, song) {
+    state.favoriteHistory = song
   }
 }
 

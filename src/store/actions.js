@@ -1,5 +1,5 @@
 import * as types from './mutation-types'
-import {saveSearch, deleteSearch, clearSearch} from 'common/js/cache'
+import {saveSearch, deleteSearch, clearSearch, saveFavorite, deleteFavorite} from 'common/js/cache'
 
 // singer 组件 播放歌曲所需数据
 export const selectPlay = function ({commit, state}, {list, index}) {
@@ -99,11 +99,11 @@ export const deleteSong = function ({commit, state}, song) {
 
   let sIndex = findIndex(sequenceList, song)
   sequenceList.splice(sIndex, 1)
-  console.log(currentIndex, pIndex, playList.length)
+
   if (currentIndex > pIndex || currentIndex === playList.length) {
     currentIndex--
   }
-  console.log(currentIndex)
+
   commit(types.SET_PLAY_LIST, playList)
   commit(types.SET_SEQUENCE_LIST, sequenceList)
   commit(types.SET_CURRENT_INDEX, currentIndex)
@@ -121,4 +121,14 @@ export const clearSongList = function ({commit}) {
   commit(types.SET_SEQUENCE_LIST, [])
   commit(types.SET_CURRENT_INDEX, -1)
   commit(types.SET_PLAYING_STATE, false)
+}
+
+// 收藏
+export const saveFavoriteHistory = function ({commit}, song) {
+  commit(types.SET_FAVORITE_HISTORY, saveFavorite(song))
+}
+
+// 取消收藏
+export const deleteFavoriteHistory = function ({commit}, song) {
+  commit(types.SET_FAVORITE_HISTORY, deleteFavorite(song))
 }

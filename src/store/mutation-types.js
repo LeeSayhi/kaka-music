@@ -21,3 +21,6 @@ export const SET_TOP_LIST = 'SET_TOP_LIST'
 
 /* 搜索历史 */
 export const SET_SEARCH_HISTORY = 'SET_SEARCH_HISTORY'
+
+/* 缓存历史 */
+export const SET_FAVORITE_HISTORY = 'SET_FAVORITE_HISTORY'
