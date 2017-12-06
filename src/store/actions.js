@@ -12,9 +12,9 @@ export const selectPlay = function ({commit, state}, {list, index}) {
 // 查找当前列表中是否有某首歌曲并返回其索引
 /**
  * [findIndex description]
- * @param  {[Array]} list [{id: 1, name: 'a'}, {id: 2, name: 'b'}]
- * @param  {[Object]} song {id: 1, name: 'a'}
- * @return {[Number]}      index
+ * @param  list [{id: 1, name: 'a'}, {id: 2, name: 'b'}]
+ * @param  song {id: 1, name: 'a'}
+ * @return index
  */
 function findIndex (list, song) {
   return list.findIndex((item) => {
@@ -22,7 +22,7 @@ function findIndex (list, song) {
   })
 }
 
-// search 组件播放歌曲所需数据
+// search 组件播放歌曲所需数据 （插入一首歌）
 export const insertSong = function ({commit, state}, song) {
   let playList = state.playList.slice()  // vuex 不能在 mutations 的回调函数外边修改，所以用 slice() 创建一个副本
   let sequenceList = state.sequenceList.slice()
@@ -85,4 +85,40 @@ export const deleteSearchHistory = function ({commit}, query) {
 // 清空搜索历史数据
 export const clearSearchHistory = function ({commit}) {
   commit(types.SET_SEARCH_HISTORY, clearSearch())
+}
+
+// 播放列表中删除某首歌曲
+export const deleteSong = function ({commit, state}, song) {
+  let playList = state.playList.slice()
+  let sequenceList = state.playList.slice()
+  let currentIndex = state.currentIndex
+
+  let pIndex = findIndex(playList, song)
+
+  playList.splice(pIndex, 1)
+
+  let sIndex = findIndex(sequenceList, song)
+  sequenceList.splice(sIndex, 1)
+  console.log(currentIndex, pIndex, playList.length)
+  if (currentIndex > pIndex || currentIndex === playList.length) {
+    currentIndex--
+  }
+  console.log(currentIndex)
+  commit(types.SET_PLAY_LIST, playList)
+  commit(types.SET_SEQUENCE_LIST, sequenceList)
+  commit(types.SET_CURRENT_INDEX, currentIndex)
+
+  if (!playList.length) {
+    commit(types.SET_PLAYING_STATE, false)
+  } else {
+    commit(types.SET_PLAYING_STATE, true)
+  }
+}
+
+// 清空播放列表
+export const clearSongList = function ({commit}) {
+  commit(types.SET_PLAY_LIST, [])
+  commit(types.SET_SEQUENCE_LIST, [])
+  commit(types.SET_CURRENT_INDEX, -1)
+  commit(types.SET_PLAYING_STATE, false)
 }
