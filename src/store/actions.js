@@ -1,5 +1,5 @@
 import * as types from './mutation-types'
-import {saveSearch, deleteSearch, clearSearch, saveFavorite, deleteFavorite} from 'common/js/cache'
+import {saveSearch, deleteSearch, clearSearch, saveFavorite, deleteFavorite, savePlay} from 'common/js/cache'
 
 // singer 组件 播放歌曲所需数据
 export const selectPlay = function ({commit, state}, {list, index}) {
@@ -72,7 +72,7 @@ export const insertSong = function ({commit, state}, song) {
   commit(types.SET_PLAYING_STATE, true)
 }
 
-// 搜索历史数据
+// 搜索历史数据缓存
 export const saveSeachHistory = function ({commit}, query) {
 	commit(types.SET_SEARCH_HISTORY, saveSearch(query))
 }
@@ -131,4 +131,9 @@ export const saveFavoriteHistory = function ({commit}, song) {
 // 取消收藏
 export const deleteFavoriteHistory = function ({commit}, song) {
   commit(types.SET_FAVORITE_HISTORY, deleteFavorite(song))
+}
+
+// 当播放一首歌时添加到最近播放最近播放
+export const savePlayHistory = function ({commit}, song) {
+  commit(types.SET_PLAY_HISTORY, savePlay(song))
 }

@@ -39,6 +39,7 @@
       .text
         flex: 1
         color: $color-text-l
+        font-size: $font-size-medium
       .icon
         extend-click()
         .icon-delete

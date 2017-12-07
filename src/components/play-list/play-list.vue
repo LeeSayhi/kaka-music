@@ -24,7 +24,7 @@
           </transition-group>
         </v-scroll>
         <div class="list-operate">
-          <div class="add">
+          <div class="add" @click="showAddSong">
             <i class="icon-add"></i>
             <span class="text">添加歌曲到队列</span>
           </div>
@@ -34,6 +34,7 @@
         </div>
       </div>
       <v-confirm ref="confirm" text="是否清空播放列表" confirmBtnText="清空" @confirm="clearList"></v-confirm>
+      <v-addSong ref="addSong"></v-addSong>
     </div>
   </transition>
 </template>
@@ -43,6 +44,7 @@
   import {playMode} from 'common/js/config'
   import {shuffle} from 'common/js/util'
   import Confirm from 'base/confirm/confirm'
+  import AddSong from 'components/add-song/add-song'
 
   export default {
     computed: {
@@ -154,6 +156,9 @@
         })
         return index > -1
       },
+      showAddSong () {
+        this.$refs.addSong.show()
+      },
       ...mapMutations({
         setPlayMode: 'SET_PLAY_MODE',
         setSequenceList: 'SET_SEQUENCE_LIST',
@@ -178,7 +183,8 @@
     },
     components: {
       'v-scroll': Scroll,
-      'v-confirm': Confirm
+      'v-confirm': Confirm,
+      'v-addSong': AddSong
     }
   }
 </script>

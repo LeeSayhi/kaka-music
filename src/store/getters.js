@@ -24,5 +24,8 @@ export const topList = state => state.topList
 /*  搜索历史 */
 export const searchHistory = state => state.searchHistory
 
-/* 缓存历史 */
+/* 收藏历史 */
 export const favoriteHistory = state => state.favoriteHistory
+
+/* 最近播放历史 */
+export const playHistory = state => state.playHistory

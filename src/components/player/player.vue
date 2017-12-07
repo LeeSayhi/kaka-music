@@ -477,7 +477,8 @@
       },
       ...mapActions([
         'saveFavoriteHistory',
-        'deleteFavoriteHistory'
+        'deleteFavoriteHistory',
+        'savePlayHistory'
       ])
     },
     watch: {
@@ -492,6 +493,7 @@
         setTimeout(() => {
           this.getLyric()
           this.$refs.audio.play()
+          this.savePlayHistory(newSong)
         }, 1000)
 
         if (this.currentLyric) {

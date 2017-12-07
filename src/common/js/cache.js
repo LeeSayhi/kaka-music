@@ -6,6 +6,9 @@ const MAX_LENGTH = 15
 const FAVORITE_KEY = '__favorite__'
 const FAVORITE_MAX_LEN = 200
 
+const PLAY_KEY = '__play__'
+const PLAY_MAX_LEN = 200
+
 /**
  * 检查数组中是否有待插入元素，如果有且第一位，就什么也不做。
  * 如果不是第一位就删除后再将带插入元素插入数组的第一位
@@ -80,7 +83,15 @@ export function deleteFavorite (song) {
 	storage.set(FAVORITE_KEY, songs)
 	return songs
 }
-
+// 读取 localstorage 中的 Favorite 数据
 export function loadFavorite () {
 	return storage.get(FAVORITE_KEY, [])
+}
+
+// 添加一条数据到 localstorage 的 play
+export function savePlay (song) {
+	let plays = storage.get(PLAY_KEY, [])
+	insertArray(plays, song, PLAY_MAX_LEN)
+	storage.set(PLAY_KEY, plays)
+	return plays
 }

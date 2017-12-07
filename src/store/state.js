@@ -12,7 +12,8 @@ const state = {
   disc: [],  // 推荐歌单
   topList: [], // 排行
   searchHistory: loadSearch(),  // 搜索历史
-  favoriteHistory: loadFavorite()  // 收藏
+  favoriteHistory: loadFavorite(),  // 收藏
+  playHistory: []
 }
 
 export default state

@@ -107,7 +107,7 @@
           }
         })
       },
-      // 当没有更多内容的时候改变标识位值位 false
+      // 当没有更多内容的时候改变标识位值为 false
       _checkMore (data) {
         const song = data.song
         if (!song.list.length || (song.curnum + song.curpage * perpage) > song.totalnum) {
