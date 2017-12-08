@@ -96,11 +96,11 @@
         </div>
         <div class="control" @click.stop="showPlayList">
           <i class="icon-playlist">
-            <play-list ref="playList"></play-list>
           </i>
         </div>
       </div>
     </transition>
+    <play-list ref="playList"></play-list>
     <audio :src="currentSong.url" ref="audio" @play="play" @error="error" @timeupdate="timeupdate" @ended="ended"></audio>
   </div>
 </template>

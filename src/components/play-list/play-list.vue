@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div class="playlist" v-show="showFlag" @click="hide">
+    <div class="playlist" v-show="showFlag" @click.self.prevent="hide">
       <div class="list-wrapper" @click.stop>
         <div class="list-header">
           <h1 class="title">

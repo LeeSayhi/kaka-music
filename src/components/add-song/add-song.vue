@@ -46,6 +46,7 @@
         showFlag: false,
         showSinger: false,
         query: '',
+        songs: [],
         switchIndex: 0,
         switches: [
           {
