@@ -8,6 +8,10 @@ import store from './store'
 
 import 'common/stylus/index.styl'
 
+import VConsole from 'vconsole'
+/* eslint-disable no-new */
+new VConsole()
+
 Vue.use(VueLazyload, {
   loading: require('common/image/default.png')
 })
