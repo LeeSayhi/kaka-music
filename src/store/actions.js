@@ -9,8 +9,9 @@ export const selectPlay = function ({commit, state}, {list, index}) {
   commit(types.SET_FULL_SCREEN, true)
   commit(types.SET_PLAYING_STATE, true)
 }
-// 查找当前列表中是否有某首歌曲并返回其索引
+
 /**
+ * 查找当前列表中是否有某首歌曲并返回其索引
  * [findIndex description]
  * @param  list [{id: 1, name: 'a'}, {id: 2, name: 'b'}]
  * @param  song {id: 1, name: 'a'}
@@ -22,7 +23,7 @@ function findIndex (list, song) {
   })
 }
 
-// search 组件播放歌曲所需数据 （插入一首歌）
+// 播放歌曲所需数据 （插入一首歌）
 export const insertSong = function ({commit, state}, song) {
   let playList = state.playList.slice()  // vuex 不能在 mutations 的回调函数外边修改，所以用 slice() 创建一个副本
   let sequenceList = state.sequenceList.slice()

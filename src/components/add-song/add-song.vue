@@ -15,12 +15,12 @@
         <div class="list-wrapper">
           <v-scroll ref="songList" :data="playHistory" class="list-scroll" v-if="switchIndex === 0">
             <div class="list-inner">
-              <v-songList :songs="playHistory"></v-songList>
+              <v-songList :songs="playHistory" @select="selectItem"></v-songList>
             </div>
           </v-scroll>
           <div class="list-scroll" v-if="switchIndex === 1">
             <div class="list-inner">
-              <v-searchList ref="searchList" :data="searchHistory"></v-searchList>
+              <v-searchList ref="searchList" :data="searchHistory" @select="addQuery"></v-searchList>
             </div>
           </div>
         </div>
@@ -46,6 +46,7 @@
   import SearchList from 'base/search-list/search-list'
   import TopTip from 'base/top-tip/top-tip'
   import {mapActions, mapGetters} from 'vuex'
+  import {Song} from 'common/js/song'
 
   export default {
     data () {
@@ -99,6 +100,21 @@
       // switches 组件的 TAB 切换
       selectSwitch (index) {
         this.switchIndex = index
+      },
+      // 添加最近播放歌曲到播放列表
+      selectItem (song) {
+        const index = this.playHistory.findIndex((item) => {
+          return item.id === song.id
+        })
+        if (index === 0) {
+          return
+        }
+        this.$refs.topTip.show()
+        this.insertSong(new Song(song))
+      },
+      // 点击搜索历史进行搜索
+      addQuery (query) {
+        this.$refs.searchBox.setQuery(query)
       },
       ...mapActions([
         'saveSeachHistory',

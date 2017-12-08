@@ -3,7 +3,7 @@ import {Base64} from 'js-base64'
 import {ERR_OK} from 'api/config'
 
 // 定义一个 Song 类
-class Song {
+export class Song {
 	// 获取歌曲的属性
 	constructor ({id, mid, singer, name, album, duration, image, url}) {
 		this.id = id

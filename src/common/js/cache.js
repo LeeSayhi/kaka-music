@@ -95,3 +95,7 @@ export function savePlay (song) {
 	storage.set(PLAY_KEY, plays)
 	return plays
 }
+
+export function loadPlay () {
+	return storage.get(PLAY_KEY, [])
+}
