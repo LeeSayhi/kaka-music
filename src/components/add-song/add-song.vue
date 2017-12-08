@@ -28,6 +28,12 @@
       <div class="search-result" v-show="query">
         <v-suggest :query="query" :showSinger="showSinger" @listScroll="blurInput" @select="saveSearch" ref="suggest"></v-suggest>
       </div>
+      <v-topTip ref="topTip">
+        <div class="tip-title">
+          <i class="icon-ok"></i>
+          <span class="text">你已成功添加一首歌曲到播放列表</span>
+        </div>
+      </v-topTip>
     </div>
   </transition>
 </template>
@@ -38,6 +44,7 @@
   import SongList from 'base/song-list/song-list'
   import Scroll from 'base/scroll/scroll'
   import SearchList from 'base/search-list/search-list'
+  import TopTip from 'base/top-tip/top-tip'
   import {mapActions, mapGetters} from 'vuex'
 
   export default {
@@ -85,6 +92,7 @@
         this.$refs.searchBox.blur()
       },
       saveSearch () {
+        this.$refs.topTip.show()
         this.saveSeachHistory(this.query)
       },
       // switches 组件的 TAB 切换
@@ -101,7 +109,8 @@
       'v-switches': Switches,
       'v-songList': SongList,
       'v-scroll': Scroll,
-      'v-searchList': SearchList
+      'v-searchList': SearchList,
+      'v-topTip': TopTip
     }
   }
 </script>
@@ -156,4 +165,15 @@
       top: 124px
       bottom: 0
       width: 100%
+    .tip-title
+      text-align: center
+      padding: 18px 0
+      font-size: 0
+      .icon-ok
+        font-size: $font-size-medium
+        color: $color-theme
+        margin-right: 4px
+      .text
+        font-size: $font-size-medium
+        color: $color-text
 </style>
