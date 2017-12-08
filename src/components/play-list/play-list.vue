@@ -34,7 +34,7 @@
         </div>
       </div>
       <v-confirm ref="confirm" text="是否清空播放列表" confirmBtnText="清空" @confirm="clearList"></v-confirm>
-      <v-addSong ref="addSong"></v-addSong>
+      <v-addSong ref="addSong" @closeAddSong="refreshPlayList"></v-addSong>
     </div>
   </transition>
 </template>
@@ -156,8 +156,13 @@
         })
         return index > -1
       },
+      // 显示添加歌曲页面
       showAddSong () {
         this.$refs.addSong.show()
+      },
+      // 添加歌曲页面返回到播放列表时重新计算滚动高度
+      refreshPlayList () {
+        this.$refs.listContent.refresh()
       },
       ...mapMutations({
         setPlayMode: 'SET_PLAY_MODE',

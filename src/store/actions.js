@@ -133,7 +133,7 @@ export const deleteFavoriteHistory = function ({commit}, song) {
   commit(types.SET_FAVORITE_HISTORY, deleteFavorite(song))
 }
 
-// 当播放一首歌时添加到最近播放最近播放
+// 当播放一首歌时添加到最近播放
 export const savePlayHistory = function ({commit}, song) {
   commit(types.SET_PLAY_HISTORY, savePlay(song))
 }

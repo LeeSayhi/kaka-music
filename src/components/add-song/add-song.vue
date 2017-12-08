@@ -84,6 +84,7 @@
       },
       hide () {
         this.showFlag = false
+        this.$emit('closeAddSong')
       },
       editQuery (query) {
         this.query = query
@@ -100,7 +101,8 @@
         this.switchIndex = index
       },
       ...mapActions([
-        'saveSeachHistory'
+        'saveSeachHistory',
+        'insertSong'
       ])
     },
     components: {

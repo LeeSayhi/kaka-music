@@ -17,7 +17,7 @@ const PLAY_MAX_LEN = 200
  */
 function insertArray (arr, value, maxLength) {
 	let index = arr.findIndex((item) => {
-		return item === value
+		return item.id === value.id
 	})
 	if (index === 0) {
 		return
