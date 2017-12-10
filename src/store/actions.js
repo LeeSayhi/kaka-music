@@ -74,7 +74,7 @@ export const insertSong = function ({commit, state}, song) {
 }
 
 // 搜索历史数据缓存
-export const saveSeachHistory = function ({commit}, query) {
+export const saveSearchHistory = function ({commit}, query) {
 	commit(types.SET_SEARCH_HISTORY, saveSearch(query))
 }
 

@@ -95,7 +95,7 @@
       },
       saveSearch () {
         this.$refs.topTip.show()
-        this.saveSeachHistory(this.query)
+        this.saveSearchHistory(this.query)
       },
       // switches 组件的 TAB 切换
       selectSwitch (index) {
@@ -117,7 +117,7 @@
         this.$refs.searchBox.setQuery(query)
       },
       ...mapActions([
-        'saveSeachHistory',
+        'saveSearchHistory',
         'insertSong'
       ])
     },

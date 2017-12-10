@@ -307,7 +307,10 @@
       },
       // 当歌曲可以播放的时候（移动端浏览器监听不到 audio 的 canPlay ？？）
       play () {
-      	this.songReady = true
+      	setTimeout(() => {
+          this.songReady = true
+        }, 500)
+        this.savePlayHistory(this.currentSong)
       },
       // 当歌曲加载失败的时候
       error () {
@@ -493,7 +496,6 @@
         setTimeout(() => {
           this.getLyric()
           this.$refs.audio.play()
-          this.savePlayHistory(newSong)
         }, 1000)
 
         if (this.currentLyric) {

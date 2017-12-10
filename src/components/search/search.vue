@@ -94,7 +94,7 @@
       },
       // 缓存搜索历史
       saveSearch () {
-        this.saveSeachHistory(this.query)
+        this.saveSearchHistory(this.query)
       },
       // 删除当前搜索歌曲
       deleteItem (item) {
@@ -108,7 +108,7 @@
         this.$refs.confirm.show()
       },
       ...mapActions([
-        'saveSeachHistory',
+        'saveSearchHistory',
         'deleteSearchHistory',
         'clearSearchHistory'
       ])

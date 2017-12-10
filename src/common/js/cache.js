@@ -15,10 +15,8 @@ const PLAY_MAX_LEN = 200
  * 如果没有直接插入
  * 如果数组长度 > 15，就删除最后一位
  */
-function insertArray (arr, value, maxLength) {
-	let index = arr.findIndex((item) => {
-		return item.id === value.id
-	})
+function insertArray (arr, value, compare, maxLength) {
+	let index = arr.findIndex(compare)
 	if (index === 0) {
 		return
 	}
@@ -26,7 +24,7 @@ function insertArray (arr, value, maxLength) {
 		arr.splice(index, 1)
 	}
 	arr.unshift(value)
-	if (maxLength && arr.length > maxLength) {
+	if (MAX_LENGTH && arr.length > MAX_LENGTH) {
 		arr.pop()
 	}
 }
@@ -44,7 +42,9 @@ function deleteFromArray (arr, value) {
 // 添加一条数据到 localstorage 的 search 中
 export function saveSearch (query) {
 	let searches = storage.get(SEARCH_KEY, [])
-	insertArray(searches, query, MAX_LENGTH)
+	insertArray(searches, query, (item) => {
+		return item === query
+	}, query, MAX_LENGTH)
 	storage.set(SEARCH_KEY, searches)
 	return searches
 }
@@ -71,7 +71,9 @@ export function loadSearch () {
 // 添加一条数据到 localstorage 的 favorite
 export function saveFavorite (song) {
 	let songs = storage.get(FAVORITE_KEY, [])
-	insertArray(songs, song, FAVORITE_MAX_LEN)
+	insertArray(songs, song, (item) => {
+		return item === song
+	}, song, FAVORITE_MAX_LEN)
 	storage.set(FAVORITE_KEY, songs)
 	return songs
 }
@@ -91,7 +93,9 @@ export function loadFavorite () {
 // 添加一条数据到 localstorage 的 play
 export function savePlay (song) {
 	let plays = storage.get(PLAY_KEY, [])
-	insertArray(plays, song, PLAY_MAX_LEN)
+	insertArray(plays, song, (item) => {
+		return item.id === song.id
+	}, song, PLAY_MAX_LEN)
 	storage.set(PLAY_KEY, plays)
 	return plays
 }
