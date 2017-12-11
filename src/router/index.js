@@ -4,6 +4,7 @@ import recommend from 'components/recommend/recommend'
 import singer from 'components/singer/singer'
 import rank from 'components/rank/rank'
 import search from 'components/search/search'
+import userCenter from 'components/user-center/user-center'
 
 import singerDetail from 'components/singer-detail/singer-detail'
 import Disc from 'components/disc/disc'
@@ -56,6 +57,10 @@ export default new Router({
           component: singerDetail
         }
       ]
+    },
+    {
+      path: '/userCenter',
+      component: userCenter
     }
   ]
 })

@@ -2,6 +2,9 @@
   <div class="header">
     <div class="icon"></div>
     <h1 class="text">Chicken Music</h1>
+    <router-link to="/userCenter" tag="div" class="user-center">
+      <i class="icon-mine"></i>
+    </router-link>
   </div>
 </template>
 <script>
@@ -31,4 +34,13 @@
       vertical-align: top
       line-height: 44px
       font-size: $font-size-large
+    .user-center
+      position: absolute
+      top: 0
+      right: 0
+      .icon-mine
+        display: block
+        padding: 12px
+        font-size: 20px
+        color: $color-theme
 </style>
