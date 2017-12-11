@@ -55,6 +55,7 @@
 	      })
 	      return ret
 	    },
+	    // 随机播放
 	    playModeAll () {
 	    	this.randomPlay(this.songs)
 	    },

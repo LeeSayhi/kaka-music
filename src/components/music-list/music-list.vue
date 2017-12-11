@@ -5,7 +5,7 @@
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
-      <div class="play-wrapper">
+      <div class="play-wrapper" v-show="playModeFlag">
         <div class="play-btn" @click="playModeALL">
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
@@ -58,7 +58,8 @@
     },
     data () {
       return {
-        scrollY: 0
+        scrollY: 0,
+        playModeFlag: true
       }
     },
     computed: {
@@ -107,6 +108,11 @@
     watch: {
       // 监听 scrollY 变化，去改变图片的高度大小等。
       scrollY (newY) {
+        if (newY < this.minTranslateY) {
+          this.playModeFlag = false
+        } else {
+          this.playModeFlag = true
+        }
         let translateY = Math.max(this.minTranslateY, newY)
         let zIndex = 0
         let scale = 1
