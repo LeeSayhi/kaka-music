@@ -1,10 +1,10 @@
 <template>
 	<transition name="slide">
-		<music-list :title="title" :bgImage="bgImage" :songs="songs"></music-list>
+		<music-list :title="title" :bgImage="bgImage" :songs="songs" @playMode="playModeAll"></music-list>
 	</transition>
 </template>
 <script>
-	import {mapGetters} from 'vuex'
+	import {mapGetters, mapActions} from 'vuex'
 
 	import {getSingerDetail} from 'api/singer'
 	import {ERR_OK} from 'api/config'
@@ -54,7 +54,13 @@
 	        }
 	      })
 	      return ret
-	    }
+	    },
+	    playModeAll () {
+	    	this.randomPlay(this.songs)
+	    },
+	    ...mapActions([
+	    	'randomPlay'
+	    ])
 		},
 		components: {
 			'music-list': musicList

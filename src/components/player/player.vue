@@ -115,6 +115,7 @@
   import Scroll from 'base/scroll/scroll'
   import Lyric from 'lyric-parser'
   import Playlist from 'components/play-list/play-list'
+  import {Song} from 'common/js/song'
 
   const transform = prefixStyle('transform')
   const transitionDuration = prefixStyle('transitionDuration')
@@ -390,7 +391,7 @@
       },
       // 获取并解析歌词
       getLyric () {
-        this.currentSong.getLyric().then((lyric) => {
+        new Song(this.currentSong).getLyric().then((lyric) => {
           this.currentLyric = new Lyric(lyric, this.handleLyric)
           this.currentLyricLines = this.currentLyric.lines
 

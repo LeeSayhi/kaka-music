@@ -7,7 +7,7 @@
       <div class="switche-wrapper">
         <v-switches :switches="switches" :currentIndex="currentIndex" @switch="switchIndex"></v-switches>
       </div>
-      <div class="play-btn">
+      <div class="play-btn" @click="randomPlayAll">
         <i class="icon-play"></i>
         <span class="text">随机播放全部</span>
       </div>
@@ -89,8 +89,18 @@
         this.$refs.favoriteList && this.$refs.favoriteList.refresh()
         this.$refs.playList && this.$refs.playList.refresh()
       },
+      randomPlayAll () {
+        let list = null
+        if (this.currentIndex === 0) {
+          list = this.favoriteHistory
+        } else {
+          list = this.playHistory
+        }
+        this.randomPlay(list)
+      },
       ...mapActions([
-        'insertSong'
+        'insertSong',
+        'randomPlay'
       ])
     },
     components: {
